@@ -12,33 +12,25 @@ from workers.payment_helpers import use_credits
 LOGGER = get_task_logger(__name__)
 
 def get_or_create_tags(action, user_id, tags):
-    select_query = f"""
-        SELECT id, name 
-        FROM meuml.tags 
-        WHERE user_id = {user_id}
+    select_query = """
+        SELECT id, name
+        FROM meuml.tags
+        WHERE user_id = :user_id
     """
-    existing_tags = action.fetchall(select_query)
+    existing_tags = action.fetchall(select_query, {'user_id': user_id})
     existing_tags = {tag['name']: tag['id'] for tag in existing_tags}
 
-    insert_query = """
-        INSERT INTO meuml.tags (user_id, name) 
-        VALUES 
-    """
-    values = []
-    for tag in tags:
-        if tag not in existing_tags:
-            values.append(f" ({user_id}, '{tag}') ")
+    new_tags = [tag for tag in tags if tag not in existing_tags]
 
-    if len(values) > 0:
-        insert_query += ','.join(values)
-        action.execute(insert_query)
+    if len(new_tags) > 0:
+        for tag in new_tags:
+            insert_query = """
+                INSERT INTO meuml.tags (user_id, name)
+                VALUES (:user_id, :name)
+            """
+            action.execute(insert_query, {'user_id': user_id, 'name': tag})
 
-        select_query = f"""
-            SELECT id, name 
-            FROM meuml.tags 
-            WHERE user_id = {user_id}
-        """
-        existing_tags = action.fetchall(select_query)
+        existing_tags = action.fetchall(select_query, {'user_id': user_id})
         existing_tags = {tag['name']: tag['id'] for tag in existing_tags}
 
     return existing_tags
@@ -95,8 +87,8 @@ def untag_advertisings(user_id: int, filter_query: str, filter_values: dict, tag
             'display_name': 'Anúncios'
         }
 
-        tags_query = f"SELECT tg.name FROM meuml.tags tg WHERE tg.id IN ({','.join(tags)})"
-        tags_names = action.fetchall(tags_query)
+        tags_query = "SELECT tg.name FROM meuml.tags tg WHERE tg.id = ANY(:tags)"
+        tags_names = action.fetchall(tags_query, {'tags': [int(t) for t in tags]})
         tags_names = [tag['name'] for tag in tags_names]
 
         for account_id, account in accounts.items():
@@ -104,7 +96,7 @@ def untag_advertisings(user_id: int, filter_query: str, filter_values: dict, tag
 
             for advertising in advertisings:
                 untag_item.delay(user_id, int(account_id), tool['id'], account['process_id'], taggable_relation['id'], taggable_relation['display_name'], advertising, tags, tags_names)
-    
+
     except Exception as e:
         LOGGER.error(traceback.format_exc())
     finally:
@@ -159,8 +151,8 @@ def untag_files(user_id: int, filter_query: str, filter_values: dict, tags: list
             'display_name': 'Arquivos'
         }
 
-        tags_query = f"SELECT tg.name FROM meuml.tags tg WHERE tg.id IN ({','.join(tags)})"
-        tags_names = action.fetchall(tags_query)
+        tags_query = "SELECT tg.name FROM meuml.tags tg WHERE tg.id = ANY(:tags)"
+        tags_names = action.fetchall(tags_query, {'tags': [int(t) for t in tags]})
         tags_names = [tag['name'] for tag in tags_names]
 
         for item in files:

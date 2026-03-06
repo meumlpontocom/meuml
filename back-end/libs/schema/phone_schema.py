@@ -6,7 +6,7 @@ from marshmallow.validate import Length
 
 class PhoneSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     country_code = String(
         validate=Length(min=1),
@@ -22,8 +22,8 @@ class PhoneSchema(Schema):
             'required' : "O campo 'código de área' é obrigatório"
         },
         allow_none=True,
-        default=None,
-        missing=None
+        dump_default=None,
+        load_default=None
     )
 
     phone_number = String(

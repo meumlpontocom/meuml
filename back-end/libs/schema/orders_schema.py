@@ -5,7 +5,7 @@ from marshmallow import validates_schema, ValidationError
 
 class OrderListSchema(Schema):
     class Meta:
-        strict = True
+        pass
     
     orders_id = List(
         Integer(),

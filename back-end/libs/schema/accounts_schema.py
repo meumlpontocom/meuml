@@ -6,7 +6,7 @@ from marshmallow import validates_schema, ValidationError
 
 class UpdateAccountName(Schema):
     class Meta:
-        strict = True
+        pass
 
     # user fields
     name = String(
@@ -22,7 +22,6 @@ class UpdateAccountName(Schema):
 class SellerSchema(Schema):
     class Meta:
         type_ = 'sellers'
-        strict = True
 
     id = Integer(required=True)
     date_created = DateTime(required=True)
@@ -30,7 +29,7 @@ class SellerSchema(Schema):
 
 class AccountSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     id = Integer()
     external_id = String()
@@ -42,18 +41,18 @@ class AccountSchema(Schema):
 
 class SyncSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     code = String(required=True)
 
 
 class OAuthSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     code = String(required=True)
 
     @validates_schema
-    def validate_code(self, data):
+    def validate_code(self, data, **kwargs):
         if data['code'] == '' :
             raise ValidationError('O campo {code} não pode estar vazio')

@@ -2,7 +2,6 @@ from marshmallow.fields import String, Integer, Dict, List
 from marshmallow.schema import Schema
 class PromotionItemSchema(Schema):
     class Meta:
-        strict = True
         type_ = 'promotion_advertising'
 
     id = String()
@@ -10,8 +9,8 @@ class PromotionItemSchema(Schema):
         String(),
         required=False,
         allow_none=True,
-        default=None,
-        missing=None,
+        dump_default=None,
+        load_default=None,
     )
     promotion_id = Integer(
         required=True,
@@ -22,6 +21,6 @@ class PromotionItemSchema(Schema):
     options = Dict(
         required=False,
         allow_none=True,
-        default=None,
-        missing=None,
+        dump_default=None,
+        load_default=None,
     )

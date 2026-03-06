@@ -7,7 +7,7 @@ from marshmallow import validates_schema, ValidationError
 
 class PriceToWinConditionsSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     price = Float(
         required=True,

@@ -6,7 +6,7 @@ from marshmallow.validate import Length
 
 class KeysSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     p256dh = String(
         validate=Length(min=1),
@@ -27,7 +27,7 @@ class KeysSchema(Schema):
 
 class SubscribeSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     endpoint = String(
         validate=Length(min=1),
@@ -44,7 +44,7 @@ class SubscribeSchema(Schema):
 
 class SendExpoNotificationSchema(Schema):
     class Meta:
-        strict = True
+        pass
         
     user_id = Integer(
         required=True,

@@ -42,12 +42,12 @@ class StockActions(Actions):
                 JOIN stock.stock st on st.article_id = ar.id
                 JOIN stock.stock_item si on si.stock_id = st.id AND si.qtd_total > 0
                 JOIN stock.warehouses wh on wh.id = si.warehouse_id 
-                WHERE ((ar.id = :id AND ar.is_parent IS FALSE) OR ar.parent_id = :id) AND ar.user_id = {self.user['id']} 
+                WHERE ((ar.id = :id AND ar.is_parent IS FALSE) OR ar.parent_id = :id) AND ar.user_id = :user_id
                 GROUP BY ar.id, wh.id
                 ORDER BY ar.id, wh.id
             """
 
-            warehouses = self.fetchall(query, {'id': article_id})
+            warehouses = self.fetchall(query, {'id': article_id, 'user_id': self.user['id']})
             
             if not warehouses:
                 self.abort_json({
@@ -118,23 +118,23 @@ class StockActions(Actions):
             if not stock_in:
                 raise Exception
 
-            query = f"""
-                UPDATE stock.stock SET 
+            query = """
+                UPDATE stock.stock SET
                     date_modified = NOW(),
-                    qtd_total = qtd_total + {self.data['quantity']},
-                    qtd_available = qtd_available + {self.data['quantity']}
-                WHERE article_id = {article_id}
+                    qtd_total = qtd_total + :quantity,
+                    qtd_available = qtd_available + :quantity
+                WHERE article_id = :article_id
                 RETURNING id
             """
-            stock_id = self.execute_returning(query)
+            stock_id = self.execute_returning(query, {'quantity': self.data['quantity'], 'article_id': article_id})
 
             if not stock_id:
                 self.conn.rollback()
                 raise Exception
 
-            query = f"""
-                INSERT INTO stock.stock_item (stock_id, warehouse_id, expiration_date, price_buy, qtd_total, qtd_reserved, qtd_available) 
-                VALUES ({stock_id}, :warehouse_id, :expiration_date, :price_buy, :qtd_total, :qtd_reserved, :qtd_available)
+            query = """
+                INSERT INTO stock.stock_item (stock_id, warehouse_id, expiration_date, price_buy, qtd_total, qtd_reserved, qtd_available)
+                VALUES (:stock_id, :warehouse_id, :expiration_date, :price_buy, :qtd_total, :qtd_reserved, :qtd_available)
                 RETURNING id
             """    
             values = {

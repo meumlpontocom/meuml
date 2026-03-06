@@ -42,17 +42,15 @@ class AccountsActions(Actions):
     @jwt_required
     @prepare
     def account_visits(self):
-        values = {'id': self.user['id']}
         if 'account_id' in request.args:
             accounts_id = request.args['account_id'].split(',')
             accounts_id = [int(account_id) for account_id in accounts_id]
-            for i, account_id in enumerate(accounts_id):
-                values[str(i)] = account_id
             accounts_info = self.fetchall(
-                f'SELECT * FROM meuml.accounts WHERE user_id=:id AND id IN (:{",:".join(values.keys())})', values)
+                'SELECT * FROM meuml.accounts WHERE user_id=:id AND id = ANY(:accounts_id)',
+                {'id': self.user['id'], 'accounts_id': accounts_id})
         else:
             accounts_info = self.fetchall(
-                f'SELECT * FROM meuml.accounts WHERE user_id=:id', values)
+                'SELECT * FROM meuml.accounts WHERE user_id=:id', {'id': self.user['id']})
             accounts_id = [account['id'] for account in accounts_info]
 
         tool = self.get_tool('accounts-visits')
@@ -65,22 +63,19 @@ class AccountsActions(Actions):
                 'status': 'error',
             }, code)
 
-        values = []
-        values += accounts_id
-
         last_month = (datetime.datetime.now() -
                       timedelta(days=30)).strftime("%Y-%m-%d")
-        values.append(datetime.datetime.strptime(
-            request.args.get('window_from', last_month), "%Y-%m-%d"))
+        window_from = datetime.datetime.strptime(
+            request.args.get('window_from', last_month), "%Y-%m-%d")
 
         today = datetime.datetime.now().strftime("%Y-%m-%d")
-        values.append(datetime.datetime.strptime(
-            request.args.get('window_to', today), "%Y-%m-%d"))
+        window_to = datetime.datetime.strptime(
+            request.args.get('window_to', today), "%Y-%m-%d")
 
-        query = f'SELECT * FROM meuml.account_visits WHERE account_id IN ({",".join(["%s"]*len(accounts_id))}) '
-        query += 'AND visits_at >= %s AND visits_at <= %s ORDER BY visits_at, account_id ASC'
+        query = 'SELECT * FROM meuml.account_visits WHERE account_id = ANY(:accounts_id) '
+        query += 'AND visits_at >= :window_from AND visits_at <= :window_to ORDER BY visits_at, account_id ASC'
 
-        visits_info = self.fetchall(query, tuple(values))
+        visits_info = self.fetchall(query, {'accounts_id': accounts_id, 'window_from': window_from, 'window_to': window_to})
 
         return self.return_success(data={'accounts': accounts_info, 'visits': visits_info})
 
@@ -271,8 +266,8 @@ class AccountsActions(Actions):
         }
         self.execute(query, values)
 
-        query = f'DELETE FROM stock.account_warehouse WHERE account_id = :account_id AND marketplace_id = {Marketplace.MercadoLibre}'
-        values = {'account_id': account['id']}
+        query = 'DELETE FROM stock.account_warehouse WHERE account_id = :account_id AND marketplace_id = :marketplace_id'
+        values = {'account_id': account['id'], 'marketplace_id': Marketplace.MercadoLibre}
         self.execute(query, values)
 
         return self.return_success("Conta deletada com sucesso", {"account_id": account['id']})

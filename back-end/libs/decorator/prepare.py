@@ -2,10 +2,7 @@
 from functools import wraps
 from flask_jwt_simple import jwt_required, get_jwt_identity
 
-try:
-    from flask import _app_ctx_stack as ctx_stack
-except ImportError:
-    from flask import _request_ctx_stack as ctx_stack
+from libs.context import ctx_stack
 
 
 from flask_jwt_simple.utils import decode_jwt

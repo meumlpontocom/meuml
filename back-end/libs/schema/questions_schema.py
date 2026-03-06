@@ -9,7 +9,7 @@ from marshmallow.fields import Integer, String
 
 class BlockUserSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     account_id = Integer(required=True)
     user_id = String(required=True)
@@ -19,7 +19,7 @@ class BlockUserSchema(Schema):
 
 class QuestionAnswerSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     account_id = String(required=True)
     question_id = String(required=True)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-import datetime
+
 import redis
 from itertools import chain
 from flask import Flask, make_response, g, jsonify
@@ -11,12 +11,9 @@ from flask_jwt_simple.exceptions import NoAuthorizationError
 from flask_rest_jsonapi import Api
 from flask_mail import Mail
 
-try:
-    from flask import _app_ctx_stack as ctx_stack
-except ImportError:
-    from flask import _request_ctx_stack as ctx_stack
+from libs.context import ctx_stack
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from api.routes import ROUTES
 from libs.database.database_postgres import connection
 
@@ -68,7 +65,7 @@ def invalid_token_loader(self):
 
 @jwt.jwt_data_loader
 def add_claims_to_access_token(user):
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     return {
         'exp': now + timedelta(days=5),
         'iat': now,

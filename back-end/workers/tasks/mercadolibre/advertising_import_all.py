@@ -33,21 +33,24 @@ def create_table_items(account, action):
 
 
 def create_table_mshops_items(account, action):
+    account_id = int(account["id"])
     query = f"""
-        CREATE TABLE IF NOT EXISTS meli_stage.mshops_items_{account["id"]} 
-            PARTITION OF meli_stage.mshops_items 
-            FOR VALUES IN ({account["id"]})
+        CREATE TABLE IF NOT EXISTS meli_stage.mshops_items_{account_id}
+            PARTITION OF meli_stage.mshops_items
+            FOR VALUES IN ({account_id})
     """
     action.execute(query, {'account_id': account['id']})
 
 
 def truncate_table_items(account, action):
-    query = f'TRUNCATE meli_stage.items_{account["id"]}'
+    account_id = int(account["id"])
+    query = f'TRUNCATE meli_stage.items_{account_id}'
     action.execute(query, {})
 
 
 def truncate_table_mshops_items(account, action):
-    query = f'TRUNCATE meli_stage.mshops_items_{account["id"]}'
+    account_id = int(account["id"])
+    query = f'TRUNCATE meli_stage.mshops_items_{account_id}'
     action.execute(query, {})
 
 

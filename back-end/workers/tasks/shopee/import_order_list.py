@@ -14,22 +14,24 @@ from workers.loggers import create_process, create_process_item, update_process_
 LOGGER = get_task_logger(__name__)
 
 def create_table_orders(account_id, action):
+    account_id = int(account_id)
     query = f"""
-        CREATE TABLE IF NOT EXISTS shopee_stage.orders_{account_id} 
-            PARTITION OF shopee_stage.orders 
+        CREATE TABLE IF NOT EXISTS shopee_stage.orders_{account_id}
+            PARTITION OF shopee_stage.orders
             FOR VALUES IN ({account_id})
     """
     action.execute(query)
 
     query = f"""
-        CREATE TABLE IF NOT EXISTS shopee_stage.order_items_{account_id} 
-            PARTITION OF shopee_stage.order_items 
+        CREATE TABLE IF NOT EXISTS shopee_stage.order_items_{account_id}
+            PARTITION OF shopee_stage.order_items
             FOR VALUES IN ({account_id})
     """
     action.execute(query)
 
 
 def truncate_table_orders(account_id, action):
+    account_id = int(account_id)
     query = f'TRUNCATE shopee_stage.orders_{account_id}'
     action.execute(query)
 

@@ -282,12 +282,13 @@ class TagsActions(Actions):
 
             process_id = create_process(account_id=advertising['account_id'], user_id=self.user['id'], tool_id=tool['id'], tool_price=tool.get('price'), items_total=1, action=self)
 
-            tags_query = f"SELECT tg.name FROM meuml.tags tg WHERE tg.id IN ({','.join(tags)})"
-            tags_names = self.fetchall(tags_query)
+            tags_int = [int(t) for t in tags]
+            tags_query = "SELECT tg.name FROM meuml.tags tg WHERE tg.id = ANY(:tags)"
+            tags_names = self.fetchall(tags_query, {'tags': tags_int})
             tags_names = [tag['name'] for tag in tags_names]
 
             status_code, message = untag_item(
-                user_id=self.user['id'], 
+                user_id=self.user['id'],
                 account_id=advertising['account_id'],
                 tool_id=tool['id'],
                 process_id=process_id, 
@@ -436,12 +437,13 @@ class TagsActions(Actions):
 
             process_id = create_process(account_id=None, user_id=self.user['id'], tool_id=tool['id'], tool_price=tool.get('price'), items_total=1, action=self, platform=None)
 
-            tags_query = f"SELECT tg.name FROM meuml.tags tg WHERE tg.id IN ({','.join(tags)})"
-            tags_names = self.fetchall(tags_query)
+            tags_int = [int(t) for t in tags]
+            tags_query = "SELECT tg.name FROM meuml.tags tg WHERE tg.id = ANY(:tags)"
+            tags_names = self.fetchall(tags_query, {'tags': tags_int})
             tags_names = [tag['name'] for tag in tags_names]
 
             status_code, message = untag_item(
-                user_id=self.user['id'], 
+                user_id=self.user['id'],
                 account_id='NULL',
                 tool_id=tool['id'],
                 process_id=process_id, 

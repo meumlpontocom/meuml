@@ -11,10 +11,7 @@ from os import getenv
 from pywebpush import webpush, WebPushException
 from werkzeug.exceptions import HTTPException
 
-try:
-    from flask import _app_ctx_stack as ctx_stack
-except ImportError:
-    from flask import _request_ctx_stack as ctx_stack
+from libs.context import ctx_stack
 
 class PushNotificationsActions(Actions):
     @jwt_required 

@@ -390,13 +390,13 @@ class MshopsAdvertisingsActions(Actions):
                 'free_shipping'] else f"Frete grátis removido do anúncio {advertising_id} com sucesso!"
 
             try:
-                query = f"""
+                query = """
                     UPDATE meuml.mshops_advertisings ma
-                    SET free_shipping = {int(request_data['free_shipping'])}
-                    WHERE ma.external_id = '{advertising_id}'
+                    SET free_shipping = :free_shipping
+                    WHERE ma.external_id = :advertising_id
                 """
 
-                self.execute(query)
+                self.execute(query, {'free_shipping': int(request_data['free_shipping']), 'advertising_id': advertising_id})
             except Exception as e:
                 self.abort_json({
                     'message': f"Erro ao atualizar frete grátis no anúncio {advertising_id}",
@@ -701,7 +701,8 @@ class MshopsAdvertisingsActions(Actions):
             if len(subscripted_accounts) == 0:
                 total = 0
                 return filter_values, query, total, accounts, {}
-            filter_query += f' AND ad.account_id IN ({",".join([str(acc) for acc in subscripted_accounts])}) '
+            filter_values['subscripted_accounts'] = [int(acc) for acc in subscripted_accounts]
+            filter_query += ' AND ad.account_id = ANY(:subscripted_accounts) '
 
         if not advertisings_id:
             advertisings_id = request.form.get('advertisings_id', []) if len(request.form.get(
@@ -756,8 +757,11 @@ class MshopsAdvertisingsActions(Actions):
         if additional_conditions:
             filter_query += additional_conditions
 
+        ALLOWED_GROUP_BY = {' ad.id, ac.id ', 'ad.id, ac.id'}
         try:
             if group_by:
+                if group_by.strip() not in {v.strip() for v in ALLOWED_GROUP_BY}:
+                    raise ValueError(f"Invalid group_by: {group_by}")
                 grouped_count = self.fetchall(
                     count_query + filter_query + f' GROUP BY ac.id, {group_by}', filter_values)
                 filter_query += f' GROUP BY {group_by} '

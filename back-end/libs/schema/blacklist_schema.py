@@ -14,7 +14,7 @@ class BlacklistAddCustomerSchema(Schema):
 
 class BlacklistListFromBlockSchema(Schema):
     class Meta:
-        strict = True
+        pass
     id = Integer()
     name = String()
 
@@ -59,14 +59,14 @@ class BlacklistListFromBlockSchema(Schema):
     )
 
     @validates_schema
-    def validate_code(self, data):
+    def validate_code(self, data, **kwargs):
         if data['questions'] is False and data['bids'] is False:
             raise ValidationError('Informe pelo menos um regra para bloquear (bids ou questions).')
 
 
 class BlacklistListDeleteSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     blacklist_id = Integer(
         required=True,
@@ -79,7 +79,7 @@ class BlacklistListDeleteSchema(Schema):
 
 class BlacklistUnblockSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     block_id = Integer(
         required=True,
@@ -105,13 +105,13 @@ class BlacklistUnblockSchema(Schema):
     )
 
     @validates_schema
-    def validate_code(self, data):
+    def validate_code(self, data, **kwargs):
         if data['questions'] is False and  data['bids'] is False:
             raise ValidationError('Informe pelo menos um regra para desbloquear (bids ou questions).')
 
 class BlacklistListShareSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     #account_id = Integer(required=True)
     blacklist_name = String(required=True)
@@ -122,7 +122,6 @@ class BlacklistListShareSchema(Schema):
 
 class BlacklistBlockCommentSchema(Schema):
     class Meta:
-        strict = True
         type_ = 'blacklist_block_comment'
 
     id = Integer(as_string=True)
@@ -136,7 +135,6 @@ class BlacklistNewMotiveSchema(Schema):
 
 class BlacklistMotivesSchema(Schema):
     class Meta:
-        strict = True
         type_ = 'blacklist_motives'
 
     id = Integer()
@@ -147,7 +145,7 @@ class BlacklistMotivesSchema(Schema):
 
 class BlacklistListBlockSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     list_name = String(
         required=True,
@@ -167,7 +165,7 @@ class BlacklistListBlockSchema(Schema):
 
 class BlacklistBlockSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     account_id = Integer(
         required=True,

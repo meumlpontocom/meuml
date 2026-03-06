@@ -15,10 +15,7 @@ from requests_oauthlib import OAuth2Session
 
 # import cx_Oracle
 import psycopg2
-try:
-    from flask import _app_ctx_stack as ctx_stack
-except ImportError:  # pragma: no cover
-    from flask import _request_ctx_stack as ctx_stack
+from libs.context import ctx_stack
 
 from libs.exceptions.exceptions import ActionsException
 from libs.database.model import Model
@@ -354,7 +351,7 @@ class Actions(object):
                 self.execute(query, {'expired_status': 0, 'id': account['id']})
 
                 account = self.fetchone(
-                    f"SELECT id, user_id, name FROM meuml.accounts WHERE id = {account['id']}")
+                    "SELECT id, user_id, name FROM meuml.accounts WHERE id = :id", {'id': account['id']})
 
                 send_notification(str(account['user_id']), {'title': 'MeuML - conta do Mercado Livre perdeu autenticação', 'url': '/contas',
                                   'body': f'A conta {account["name"]} do Mercado Livre perdeu autenticação. Por favor, faça login e autorize novamente a integração com o MeuML'})
@@ -376,7 +373,7 @@ class Actions(object):
             self.execute(query, {'expired_status': 0, 'id': account['id']})
 
             account = self.fetchone(
-                f"SELECT id, user_id, name FROM meuml.accounts WHERE id = {account['id']}")
+                "SELECT id, user_id, name FROM meuml.accounts WHERE id = :id", {'id': account['id']})
 
             send_notification(str(account['user_id']), {'title': 'MeuML - conta do Mercado Livre perdeu autenticação', 'url': '/contas',
                               'body': f'A conta {account["name"]} do Mercado Livre perdeu autenticação. Por favor, faça login e autorize novamente a integração com o MeuML'})
@@ -475,11 +472,11 @@ class Actions(object):
                 }, 400)
 
             if isinstance(json_data, dict):
-                data, errors = schema.load(json_data)
+                data = schema.load(json_data)
             else:
                 data = []
                 for obj in json_data:
-                    objs, errors = schema.load(obj)
+                    objs = schema.load(obj)
                     data.append(objs)
 
             self.data = data
@@ -663,17 +660,20 @@ class Actions(object):
             if len(subscripted_accounts) == 0:
                 total = 0
                 return filter_values, query, total, accounts
-            filter_query += f' AND ad.account_id IN ({",".join([str(acc) for acc in subscripted_accounts])}) '
+            filter_query += ' AND ad.account_id = ANY(:subscripted_accounts) '
+            filter_values['subscripted_accounts'] = subscripted_accounts
 
         if not advertisings_id:
             advertisings_id = request.form.get('advertisings_id', []) if len(request.form.get(
                 'advertisings_id', [])) > 0 else request.args.get('advertisings_id', [])
 
         if len(advertisings_id) > 0:
+            advertisings_id_list = [int(x) for x in advertisings_id.split(',')] if isinstance(advertisings_id, str) else [int(x) for x in advertisings_id]
             if select_all is False:
-                filter_query += f' AND ad.id IN ({advertisings_id}) '
+                filter_query += ' AND ad.id = ANY(:advertisings_id) '
             else:
-                filter_query += f' AND ad.id NOT IN ({advertisings_id}) '
+                filter_query += ' AND ad.id != ALL(:advertisings_id) '
+            filter_values['advertisings_id'] = advertisings_id_list
         # elif mass_operation:
         #     total = 0
         #     return filter_values, query, total, accounts
@@ -722,13 +722,16 @@ class Actions(object):
                 filter_query += ' AND ad.logistics @> \'[{"is_free": true}]\' '
 
         if 'meuml_tags' in request.args:
-            filter_query += f""" AND {len(request.args["meuml_tags"].split(','))} = (
+            meuml_tag_ids = [int(t) for t in request.args["meuml_tags"].split(',')]
+            filter_query += """ AND :meuml_tags_count = (
                 SELECT COUNT(distinct ti2.tag_id)
                 FROM meuml.tagged_items ti2
-                WHERE ti2.tag_id IN ({request.args["meuml_tags"]}) AND ti2.item_id = ad.id
+                WHERE ti2.tag_id = ANY(:meuml_tags) AND ti2.item_id = ad.id
                 GROUP BY ti2.item_id
             )
             """
+            filter_values['meuml_tags_count'] = len(meuml_tag_ids)
+            filter_values['meuml_tags'] = meuml_tag_ids
 
         if additional_conditions:
             filter_query += additional_conditions
@@ -781,7 +784,8 @@ class Actions(object):
             if len(subscripted_accounts) == 0:
                 total = 0
                 return filter_values, query, total, accounts, {}
-            filter_query += f' AND ad.account_id IN ({",".join([str(acc) for acc in subscripted_accounts])}) '
+            filter_query += ' AND ad.account_id = ANY(:subscripted_accounts) '
+            filter_values['subscripted_accounts'] = subscripted_accounts
 
         if not advertisings_id:
             advertisings_id = request.form.get('advertisings_id', []) if len(request.form.get(
@@ -905,13 +909,16 @@ class Actions(object):
 
         if len(request.args.get('meuml_tags', '')) > 0:
             print('adding query')
-            filter_query += f""" AND {len(request.args["meuml_tags"].split(','))} = (
+            meuml_tag_ids = [int(t) for t in request.args["meuml_tags"].split(',')]
+            filter_query += """ AND :meuml_tags_count = (
                 SELECT COUNT(distinct ti2.tag_id)
                 FROM meuml.tagged_items ti2
-                WHERE ti2.tag_id IN ({request.args["meuml_tags"]}) AND ti2.item_id = ad.external_id
+                WHERE ti2.tag_id = ANY(:meuml_tags) AND ti2.item_id = ad.external_id
                 GROUP BY ti2.item_id
             )
             """
+            filter_values['meuml_tags_count'] = len(meuml_tag_ids)
+            filter_values['meuml_tags'] = meuml_tag_ids
 
         if 'filter_price_to_win' in request.args and len(request.args['filter_price_to_win']) > 0:
             filter_query += ' AND pw.status IN ('

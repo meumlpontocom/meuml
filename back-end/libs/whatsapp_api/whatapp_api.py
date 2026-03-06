@@ -163,12 +163,19 @@ class WhatsappApi:
             return False
 
         if phones:
-            query = f"""
+            query = """
                 INSERT INTO meuml.processes (user_id, account_id, tool_id, tool_price, items_total, platform)
-                VALUES ({user_id}, {account_id}, {tool['id']}, {tool['price']}, {len(phones) if phones is not None else 0}, '{platform}')
+                VALUES (:user_id, :account_id, :tool_id, :tool_price, :items_total, :platform)
                 RETURNING id
             """
-            process_id = action.execute_insert(query)
+            process_id = action.execute_insert(query, {
+                'user_id': user_id,
+                'account_id': account_id,
+                'tool_id': tool['id'],
+                'tool_price': tool['price'],
+                'items_total': len(phones) if phones is not None else 0,
+                'platform': platform
+            })
 
             query = """
                 INSERT INTO meuml.process_items (account_id, tool_id, process_id, item_external_id, status, message, http_status, http_body)
@@ -220,4 +227,4 @@ class WhatsappApi:
                     action.execute(query, values)
 
             action.execute(
-                f"UPDATE meuml.processes SET date_finished = NOW() WHERE id = {process_id}")
+                "UPDATE meuml.processes SET date_finished = NOW() WHERE id = :id", {'id': process_id})

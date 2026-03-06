@@ -108,12 +108,12 @@ class VacationModeActions(Actions):
         #         'status':'error',
         #     }, 402)
 
-        query = f"""
-            SELECT * 
+        query = """
+            SELECT *
             FROM meuml.vacations vc
-            WHERE vc.has_finished IS FALSE AND vc.account_id IN ({','.join([str(account_id) for account_id in accounts_id])})
+            WHERE vc.has_finished IS FALSE AND vc.account_id = ANY(:accounts_id)
         """
-        if len(self.fetchall(query)) > 0:
+        if len(self.fetchall(query, {'accounts_id': list(accounts_id)})) > 0:
             self.abort_json({
                 'message': 'Ao menos uma das contas selecionadas já se encontram em modo férias!',
                 'status': 'error',
@@ -166,19 +166,19 @@ class VacationModeActions(Actions):
                 'status': 'error',
             }, 400)
         
-        expiration = self.fetchone(f"""
+        expiration = self.fetchone("""
             SELECT MIN(latest_account_expiration_date) AS earliest_date
-            FROM (	
+            FROM (
                 SELECT sa.account_id, max(su.expiration_date) as latest_account_expiration_date
                 FROM meuml.subscriptions su
-                JOIN meuml.subscription_accounts sa on sa.subscription_id = su.id 
-                WHERE 
-                    su.user_id = {self.user['id']} AND 
-                    (su.package_id = 2 OR string_to_array(su.modules, ',') @> array['6']) AND 
-                    sa.account_id = {vacation['account_id']}
-                GROUP BY sa.account_id 
+                JOIN meuml.subscription_accounts sa on sa.subscription_id = su.id
+                WHERE
+                    su.user_id = :user_id AND
+                    (su.package_id = 2 OR string_to_array(su.modules, ',') @> array['6']) AND
+                    sa.account_id = :account_id
+                GROUP BY sa.account_id
             ) subquery
-        """)
+        """, {'user_id': self.user['id'], 'account_id': vacation['account_id']})
         
         if expiration['earliest_date'] is None or expiration['earliest_date'] < datetime.now():
             self.abort_json({
@@ -198,7 +198,7 @@ class VacationModeActions(Actions):
                 }, 500)
 
         else:
-            self.execute(f"DELETE FROM meuml.vacations WHERE id = {vacation['id']}") 
+            self.execute("DELETE FROM meuml.vacations WHERE id = :id", {'id': vacation['id']}) 
             if vacation['tag_id']:
                 query = """
                     DELETE FROM meuml.tagged_items 

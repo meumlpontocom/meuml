@@ -23,12 +23,14 @@ class FaqActions(Actions):
                 WHERE hide_question IS FALSE
             """
 
+            values = {}
             if 'tag' in request.args and len(request.args['tag']) > 0:
-                query += f" AND UPPER(tag) = UPPER('{request.args['tag']}')"
+                query += " AND UPPER(tag) = UPPER(:tag)"
+                values['tag'] = request.args['tag']
 
             query += " ORDER BY position ASC"
 
-            data = self.fetchall(query)
+            data = self.fetchall(query, values)
 
             return self.return_success(data=data)
 
@@ -111,7 +113,7 @@ class FaqActions(Actions):
                 }, 403)
 
             question = self.fetchone(
-                f"SELECT * FROM meuml.faq WHERE id = {id}")
+                "SELECT * FROM meuml.faq WHERE id = :id", {'id': id})
             if question is None:
                 self.abort_json({
                     'message': f'Pergunta não encontrada',
@@ -143,7 +145,7 @@ class FaqActions(Actions):
                     answer = :answer,
                     videol_url = :video_url,
                     tag = :tag
-                WHERE id = {id}
+                WHERE id = :id
                 RETURNING id
             """
             values = {
@@ -155,6 +157,7 @@ class FaqActions(Actions):
                 'tag': self.data['tag']
             }
 
+            values['id'] = id
             if not self.execute_returning(query, values, raise_exception=True):
                 if self.data['position'] < question['position']:
                     self.execute("""
@@ -192,13 +195,13 @@ class FaqActions(Actions):
                     'status': 'error',
                 }, 403)
 
-            query = f"""
-                DELETE FROM meuml.faq 
-                WHERE id = {id} 
-                RETURNING position 
+            query = """
+                DELETE FROM meuml.faq
+                WHERE id = :id
+                RETURNING position
             """
 
-            position = self.execute_returning(query, raise_exception=True)
+            position = self.execute_returning(query, {'id': id}, raise_exception=True)
 
             if not position:
                 raise Exception

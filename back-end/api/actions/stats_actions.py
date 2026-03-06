@@ -38,11 +38,14 @@ class StatsActions(Actions):
 
         grid_day = datetime.now() - timedelta(days=1)
         values['position_at'] = datetime.strptime(f'{grid_day.year}-{grid_day.month}-{grid_day.day}', "%Y-%m-%d")       
-        date_id = self.fetchone(f'SELECT dw.get_data_id(\'{values["position_at"]}\') as initial, dw.get_data_id(current_date) as current')
+        date_id = self.fetchone('SELECT dw.get_data_id(:position_at) as initial, dw.get_data_id(current_date) as current', {'position_at': str(values['position_at'])})
         values['visits_at'] = date_id['initial'] if date_id['initial'] else -1
 
         # visits_table = "dw.f_advertising_visits" if not date_id['initial'] or date_id['initial'] > date_id['current']-90 else "historic.advertising_visits_hist"
         visits_table = "dw.f_advertising_visits"
+        ALLOWED_VISITS_TABLES = {'dw.f_advertising_visits', 'historic.advertising_visits_hist'}
+        if visits_table not in ALLOWED_VISITS_TABLES:
+            raise ValueError(f"Invalid visits_table: {visits_table}")
 
         query = f"""
             SELECT {",".join(fields)} 
@@ -54,10 +57,8 @@ class StatsActions(Actions):
             JOIN meuml.accounts ac ON ad.account_id = ac.id 
         """  
 
-        add_query = " AND ad.account_id IN ("
-        for account_id in subscripted_accounts:
-            add_query += str(account_id) + ","
-        add_query = add_query[:-1] + ") "
+        values['subscripted_accounts'] = [int(acc) for acc in subscripted_accounts]
+        add_query = " AND ad.account_id = ANY(:subscripted_accounts) "
 
         values, query, total, *_ = self.apply_filter(request, query, values=values, additional_conditions=add_query)
 
@@ -401,20 +402,27 @@ class StatsActions(Actions):
                 'status': 'error'
             }, 400)
         
-        date_ids = self.fetchone(f"SELECT dw.get_data_id('{window_from}') as initial, dw.get_data_id('{window_to}') as final, dw.get_data_id(current_date) as current ")
+        date_ids = self.fetchone("SELECT dw.get_data_id(:window_from) as initial, dw.get_data_id(:window_to) as final, dw.get_data_id(current_date) as current",
+            {'window_from': str(window_from), 'window_to': str(window_to)})
 
         # visits_table = "dw.f_advertising_visits" if date_ids['initial'] > date_ids['current']-90 else "historic.advertising_visits_hist"
         visits_table = "dw.f_advertising_visits"
 
+        ALLOWED_VISITS_TABLES = {'dw.f_advertising_visits', 'historic.advertising_visits_hist'}
+        if visits_table not in ALLOWED_VISITS_TABLES:
+            raise ValueError(f"Invalid visits_table: {visits_table}")
+
         query = f"""
-            SELECT av.qtd_visitas as visits, TO_CHAR(dd.data_date, \'MM/DD/YYYY\') AS "visits_at" 
-            FROM dw.dim_datas dd 
+            SELECT av.qtd_visitas as visits, TO_CHAR(dd.data_date, 'MM/DD/YYYY') AS "visits_at"
+            FROM dw.dim_datas dd
             LEFT JOIN {visits_table} av
                 ON av.advertising_id=:advertising_id AND av.data_id = dd.id
-            WHERE av.data_id BETWEEN {date_ids['initial']} AND {date_ids['final']}  
+            WHERE av.data_id BETWEEN :initial AND :final
             ORDER BY dd.data_date ASC
         """
-        visits_info = [] 
+        values['initial'] = date_ids['initial']
+        values['final'] = date_ids['final']
+        visits_info = []
 
         try:
             visits_info = self.fetchall(query, values)

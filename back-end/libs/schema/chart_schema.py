@@ -6,7 +6,6 @@ from marshmallow.validate import Length
 
 class ChartModificationTemplateSchema(Schema2):
     class Meta:
-        strict = True
         type_ = 'chart'
     account_id = Integer(required=True)
     chart = Dict(required=True)
@@ -15,7 +14,6 @@ class ChartModificationTemplateSchema(Schema2):
 class ChartRowTemplateSchema(Schema2):
 
     class Meta:
-        strict = True
         type_ = 'chart'
     account_id = Integer(required=True)
     attributes = List(Dict(), required=True)
@@ -24,7 +22,6 @@ class ChartRowTemplateSchema(Schema2):
 class ChartSearchSchema(Schema2):
 
     class Meta:
-        strict = True
         type_ = 'chart'
     account_id = Integer(required=True)
     domain_id = String(required=True)
@@ -32,7 +29,6 @@ class ChartSearchSchema(Schema2):
 
 class ChartTemplateSchema(Schema2):
     class Meta:
-        strict = True
         type_ = 'chart'
     account_id = Integer(required=True)
     name = String(required=True)
@@ -43,7 +39,7 @@ class ChartTemplateSchema(Schema2):
 
 class ChartAdvertisingSelectionSchema(Schema2):
     class Meta:
-        strict = True
+        pass
 
     advertisings_id = List(
         String(),

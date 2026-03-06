@@ -228,8 +228,8 @@ class StorageActions(Actions):
             query = "DELETE FROM meuml.files WHERE id=:id"
             self.execute(query, {'id': file_id})
 
-            query = f"DELETE FROM meuml.tagged_items WHERE item_id = '{file_id}'"
-            self.execute(query)
+            query = "DELETE FROM meuml.tagged_items WHERE item_id = :item_id"
+            self.execute(query, {'item_id': str(file_id)})
 
             return self.return_success("Arquivo removido com sucesso")
 
@@ -308,12 +308,12 @@ class StorageActions(Actions):
                     thumbnail_path = '/'.join(thumbnail_path[2:])
                     minio_client.remove_object(bucket_name=bucket_name, object_name=thumbnail_path)
 
-            query = f"DELETE FROM meuml.files WHERE id IN ({','.join(ids)})"
-            self.execute(query)
+            ids_int = [int(i) for i in ids]
+            query = "DELETE FROM meuml.files WHERE id = ANY(:ids)"
+            self.execute(query, {'ids': ids_int})
 
-            ids_string = "','".join(ids)
-            query = f"DELETE FROM meuml.tagged_items WHERE item_id IN ('{ids_string}')"
-            self.execute(query)
+            query = "DELETE FROM meuml.tagged_items WHERE item_id = ANY(:ids)"
+            self.execute(query, {'ids': ids})
 
             return self.return_success(f"Arquivo(s) removido(s) com sucesso")
 
@@ -670,10 +670,12 @@ class StorageActions(Actions):
             ids = request.form.get('ids',[]) if len(request.form.get('ids',[])) > 0 else request.args.get('ids',[])
         
         if ids and len(ids) > 0:
-            if select_all is False:   
-                filter_query += f' AND fi.id IN ({ids}) '
+            ids_list = [int(i.strip()) for i in ids.split(',')] if isinstance(ids, str) else [int(i) for i in ids]
+            filter_values['ids_list'] = ids_list
+            if select_all is False:
+                filter_query += ' AND fi.id = ANY(:ids_list) '
             else:
-                filter_query += f' AND fi.id NOT IN ({ids}) '
+                filter_query += ' AND fi.id != ALL(:ids_list) '
 
         if len(request.args.get('filter_string', '')) > 0:
             filter_query += " AND UPPER(fi.name) LIKE :filter_string "
@@ -687,12 +689,15 @@ class StorageActions(Actions):
                 filter_query += ' AND parent_id IS NULL '
 
         if len(request.args.get('meuml_tags', '')) > 0:
-            filter_query += f""" AND {len(request.args["meuml_tags"].split(','))} = (
-                    SELECT COUNT(distinct ti2.tag_id) 
-                    FROM meuml.tagged_items ti2 
-                    WHERE ti2.tag_id IN ({request.args["meuml_tags"]}) AND ti2.item_id = fi.id::varchar AND ti2.type_id = 3 
-                    GROUP BY ti2.item_id 
-                ) 
+            meuml_tags_list = [int(t.strip()) for t in request.args["meuml_tags"].split(',')]
+            filter_values['meuml_tags'] = meuml_tags_list
+            filter_values['meuml_tags_count'] = len(meuml_tags_list)
+            filter_query += """ AND :meuml_tags_count = (
+                    SELECT COUNT(distinct ti2.tag_id)
+                    FROM meuml.tagged_items ti2
+                    WHERE ti2.tag_id = ANY(:meuml_tags) AND ti2.item_id = fi.id::varchar AND ti2.type_id = 3
+                    GROUP BY ti2.item_id
+                )
             """
 
         if additional_conditions:

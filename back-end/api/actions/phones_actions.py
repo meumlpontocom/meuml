@@ -112,14 +112,14 @@ class PhonesActions(Actions):
                     'status': 'error',
                 }, 500)
 
-            query = f"""
+            query = """
                 SELECT
                     ph.id, ph.date_created, ph.date_modified, ph.is_confirmed,
                     ph.country_code, ph.area_code, ph.phone_number, ph.topics
                 FROM meuml.phones ph
-                WHERE ph.id = {id}
+                WHERE ph.id = :id
             """
-            phone = self.fetchone(query)
+            phone = self.fetchone(query, {'id': id})
 
             return self.return_success("Configurações notificações por WhatsApp salvas com sucesso", data=phone)
 
@@ -141,12 +141,12 @@ class PhonesActions(Actions):
         self.validate(PhoneSchema())
 
         try:
-            query = f"""
+            query = """
                 SELECT ph.id, ph.country_code, ph.area_code, ph.phone_number
                 FROM meuml.phones ph
-                WHERE ph.id = {id} AND user_id = {self.user['id']}
+                WHERE ph.id = :id AND user_id = :user_id
             """
-            phone = self.fetchone(query)
+            phone = self.fetchone(query, {'id': id, 'user_id': self.user['id']})
 
             if not phone:
                 self.abort_json({
@@ -182,7 +182,7 @@ class PhonesActions(Actions):
                     area_code = :area_code,
                     phone_number = :phone_number,
                     topics = :topics {modified_phone if modified_phone else ''}
-                WHERE id = {id} AND user_id = {self.user['id']}
+                WHERE id = :id AND user_id = :user_id
                 RETURNING id
             """
             values = {
@@ -190,19 +190,21 @@ class PhonesActions(Actions):
                 'area_code': self.data['area_code'],
                 'phone_number': self.data['phone_number'],
                 'topics': self.data['topics'],
+                'id': id,
+                'user_id': self.user['id'],
             }
 
             if not self.execute_returning(query, values, raise_exception=True):
                 raise Exception
 
-            query = f"""
+            query = """
                 SELECT
                     ph.id, ph.date_created, ph.date_modified, ph.is_confirmed,
                     ph.country_code, ph.area_code, ph.phone_number, ph.topics
                 FROM meuml.phones ph
-                WHERE ph.id = {id}
+                WHERE ph.id = :id
             """
-            phone = self.fetchone(query)
+            phone = self.fetchone(query, {'id': id})
 
             return self.return_success("Configurações notificações por WhatsApp atualizadas com sucesso", data=phone)
 
@@ -221,13 +223,13 @@ class PhonesActions(Actions):
     @prepare
     def delete(self, id):
         try:
-            query = f"""
+            query = """
                 DELETE FROM meuml.phones
-                WHERE id = {id} AND user_id = {self.user['id']}
+                WHERE id = :id AND user_id = :user_id
                 RETURNING id
             """
 
-            if self.execute_returning(query, raise_exception=True):
+            if self.execute_returning(query, {'id': id, 'user_id': self.user['id']}, raise_exception=True):
                 return self.return_success("Celular excluído com sucesso")
             else:
                 self.abort_json({
@@ -255,12 +257,12 @@ class PhonesActions(Actions):
     @prepare
     def resend_code(self, id):
         try:
-            query = f"""
+            query = """
                 SELECT ph.id, ph.country_code, ph.area_code, ph.phone_number, ph.is_confirmed, ph.confirmation_code
                 FROM meuml.phones ph
-                WHERE ph.id = {id} AND user_id = {self.user['id']}
+                WHERE ph.id = :id AND user_id = :user_id
             """
-            phone = self.fetchone(query)
+            phone = self.fetchone(query, {'id': id, 'user_id': self.user['id']})
 
             if not phone:
                 self.abort_json({
@@ -303,12 +305,12 @@ class PhonesActions(Actions):
     @prepare
     def confirm_number(self, id, code):
         try:
-            query = f"""
+            query = """
                 SELECT ph.id, ph.is_confirmed, ph.confirmation_code
                 FROM meuml.phones ph
-                WHERE ph.id = {id} AND user_id = {self.user['id']}
+                WHERE ph.id = :id AND user_id = :user_id
             """
-            phone = self.fetchone(query)
+            phone = self.fetchone(query, {'id': id, 'user_id': self.user['id']})
 
             if not phone:
                 self.abort_json({
@@ -322,14 +324,14 @@ class PhonesActions(Actions):
                     'status': 'error',
                 }, 403)
 
-            query = f"""
+            query = """
                 UPDATE meuml.phones
                 SET date_modified = NOW(), is_confirmed = True
-                WHERE id = {id} AND user_id = {self.user['id']}
+                WHERE id = :id AND user_id = :user_id
                 RETURNING id
             """
 
-            if not self.execute_returning(query, {}, raise_exception=True):
+            if not self.execute_returning(query, {'id': id, 'user_id': self.user['id']}, raise_exception=True):
                 raise Exception
 
             return self.return_success("Número confirmado com sucesso")

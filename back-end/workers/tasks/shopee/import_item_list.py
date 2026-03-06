@@ -15,6 +15,7 @@ LOGGER = get_task_logger(__name__)
 
 
 def create_table_items(account_id, action):
+    account_id = int(account_id)
     query = f"""
         CREATE TABLE IF NOT EXISTS shopee_stage.items_{account_id}
             PARTITION OF shopee_stage.items
@@ -45,6 +46,7 @@ def create_table_items(account_id, action):
 
 
 def truncate_table_items(account_id, action):
+    account_id = int(account_id)
     query = f'TRUNCATE shopee_stage.items_{account_id}'
     action.execute(query)
 

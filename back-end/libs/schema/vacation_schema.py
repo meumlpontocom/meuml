@@ -22,4 +22,4 @@ class ActivateVacationSchema(Schema):
 
     starts_at = DateTime(format='%Y-%m-%d %H:%M', required=False, allow_none=True)
     ends_at = DateTime(format='%Y-%m-%d %H:%M', required=False, allow_none=True)
-    pause_full = Boolean(default=False, missing=False, allow_none=True)
+    pause_full = Boolean(dump_default=False, load_default=False, allow_none=True)

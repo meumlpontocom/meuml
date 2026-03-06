@@ -54,15 +54,15 @@ class DashboardActions(Actions):
                 'status': 'error',
             }, 402)
 
-        additional_condition = f" ({','.join(accounts_id)}) "
+        accounts_id_int = [int(aid) for aid in accounts_id]
 
         # Get current period data
         data['daily'] = self.get_daily_data(
-            from_date, to_date, additional_condition)
+            from_date, to_date, accounts_id_int)
         data['summary'] = self.get_advertising_visits(
-            from_date, to_date, additional_condition)
+            from_date, to_date, accounts_id_int)
         data['summary'] = self.get_orders(
-            data['summary'], from_date, to_date, additional_condition)
+            data['summary'], from_date, to_date, accounts_id_int)
         data['summary'] = self.get_questions_quantity(
             data['summary'], accounts)
 
@@ -89,7 +89,8 @@ class DashboardActions(Actions):
             # Get current active advertising quantity
             if today == from_date.strftime("%Y-%m-%d"):
                 count = self.fetchone(
-                    f"SELECT count(*) AS active_advertisings FROM meuml.advertisings ad WHERE status = 'active' AND ad.account_id IN {additional_condition}")
+                    "SELECT count(*) AS active_advertisings FROM meuml.advertisings ad WHERE status = 'active' AND ad.account_id = ANY(:accounts_id)",
+                    {'accounts_id': accounts_id_int})
                 if count:
                     data['summary']['active_advertisings'] = count['active_advertisings']
 
@@ -102,9 +103,9 @@ class DashboardActions(Actions):
 
         #data['previous_daily'] = self.get_daily_data(from_date, to_date)
         previous_summary = self.get_advertising_visits(
-            from_date, to_date, additional_condition)
+            from_date, to_date, accounts_id_int)
         previous_summary = self.get_orders(
-            previous_summary, from_date, to_date, additional_condition)
+            previous_summary, from_date, to_date, accounts_id_int)
         previous_summary['new_questions'] = 0
 
         # calculate percentage variation
@@ -119,19 +120,20 @@ class DashboardActions(Actions):
 
         return self.return_success(data=data)
 
-    def get_advertising_visits(self, from_date, to_date, additional_condition):
+    def get_advertising_visits(self, from_date, to_date, accounts_id_list):
         date_ids = self.fetchone(
-            f"SELECT dw.get_data_id('{from_date}') as initial, dw.get_data_id('{to_date}') as final ")
+            "SELECT dw.get_data_id(:from_date) as initial, dw.get_data_id(:to_date) as final",
+            {'from_date': str(from_date), 'to_date': str(to_date)})
 
         # Get ads and visits total quantity
-        query = f"""
+        query = """
             SELECT COALESCE(MAX(active_advertisings),0) as active_advertisings, COALESCE(SUM(av.qtd_visitas),0)::integer as total_visits
-            FROM meuml.accounts ac 
+            FROM meuml.accounts ac
             JOIN dw.f_account_visits av ON av.account_id = ac.id
-            WHERE ac.user_id = :user_id AND av.data_id BETWEEN {date_ids['initial']} AND {date_ids['final']} 
-            AND ac.id IN {additional_condition}
+            WHERE ac.user_id = :user_id AND av.data_id BETWEEN :initial AND :final
+            AND ac.id = ANY(:accounts_id)
         """
-        values = {'user_id': self.user['id']}
+        values = {'user_id': self.user['id'], 'initial': date_ids['initial'], 'final': date_ids['final'], 'accounts_id': accounts_id_list}
         summary = self.fetchone(query, values)
 
         if not summary:
@@ -142,19 +144,24 @@ class DashboardActions(Actions):
 
         return summary
 
-    def get_orders(self, summary, from_date, to_date, additional_condition):
+    def get_orders(self, summary, from_date, to_date, accounts_id_list):
         # Get orders total quantity
-        query = f"""
+        query = """
             SELECT os.substatus, COUNT(od.id)::integer quantity, SUM(od.total_amount) as total_amount
-            FROM meuml.accounts ac 
+            FROM meuml.accounts ac
             JOIN meuml.orders od ON od.account_id = ac.id
-            LEFT JOIN meuml.order_shipments os ON os.order_id = od.id 
-            WHERE ac.user_id = :user_id AND od.status = 'paid' AND od.date_created BETWEEN '{from_date.strftime("%Y-%m-%d 00:00:00")}' AND '{to_date.strftime("%Y-%m-%d 23:59:59")}'
-            AND ac.id IN {additional_condition}
+            LEFT JOIN meuml.order_shipments os ON os.order_id = od.id
+            WHERE ac.user_id = :user_id AND od.status = 'paid' AND od.date_created BETWEEN :date_from AND :date_to
+            AND ac.id = ANY(:accounts_id)
             GROUP BY os.substatus
         """
 
-        values = {'user_id': self.user['id']}
+        values = {
+            'user_id': self.user['id'],
+            'date_from': from_date.strftime("%Y-%m-%d 00:00:00"),
+            'date_to': to_date.strftime("%Y-%m-%d 23:59:59"),
+            'accounts_id': accounts_id_list
+        }
         orders = self.fetchall(query, values)
 
         summary['total_orders'] = 0
@@ -210,21 +217,22 @@ class DashboardActions(Actions):
                 visits_today += response_data.get('total_visits')
         return visits_today
 
-    def get_daily_data(self, from_date, to_date, additional_condition):
+    def get_daily_data(self, from_date, to_date, accounts_id_list):
         date_ids = self.fetchone(
-            f"SELECT dw.get_data_id('{from_date}') as initial, dw.get_data_id('{to_date}') as final ")
+            "SELECT dw.get_data_id(:from_date) as initial, dw.get_data_id(:to_date) as final",
+            {'from_date': str(from_date), 'to_date': str(to_date)})
 
-        query = f"""
-            SELECT TO_CHAR(dd.data_date, \'MM/DD/YYYY\') as date, COUNT(od.id)::integer as orders, SUM(av.qtd_visitas)::integer as visits 
+        query = """
+            SELECT TO_CHAR(dd.data_date, 'MM/DD/YYYY') as date, COUNT(od.id)::integer as orders, SUM(av.qtd_visitas)::integer as visits
 			FROM dw.dim_datas dd
             JOIN meuml.accounts ac ON ac.user_id = :user_id
-            LEFT JOIN meuml.orders od ON od.account_id = ac.id AND od.date_created::date = dd.data_date 
+            LEFT JOIN meuml.orders od ON od.account_id = ac.id AND od.date_created::date = dd.data_date
             LEFT JOIN dw.f_account_visits av ON av.account_id = ac.id AND av.data_id = dd.id
-            WHERE dd.id BETWEEN {date_ids['initial']} AND {date_ids['final']} AND ac.id IN {additional_condition}
-            GROUP BY "date" 
-            ORDER BY "date" 
+            WHERE dd.id BETWEEN :initial AND :final AND ac.id = ANY(:accounts_id)
+            GROUP BY "date"
+            ORDER BY "date"
         """
-        values = {'user_id': self.user['id']}
+        values = {'user_id': self.user['id'], 'initial': date_ids['initial'], 'final': date_ids['final'], 'accounts_id': accounts_id_list}
         data = self.fetchall(query, values)
         return data
 

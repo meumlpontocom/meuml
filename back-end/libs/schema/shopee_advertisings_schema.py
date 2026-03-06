@@ -13,20 +13,19 @@ from marshmallow.schema import Schema as Sc
 
 class AdvertisingListSchema(Schema):
     class Meta:
-        strict = True
         type_ = "shopee_duplicate_advertising_list"
 
     id = Integer()
-    allow_duplicated_account = Boolean(default=False, required=True)
-    allow_duplicated_title = Boolean(default=False, required=True)
+    allow_duplicated_account = Boolean(dump_default=False, required=True)
+    allow_duplicated_title = Boolean(dump_default=False, required=True)
     account_id = List(Integer(), required=True)
     advertisings = List(Dict(), required=True)
-    mass_override = Dict(default=None, allow_none=True, missing=None)
+    mass_override = Dict(dump_default=None, allow_none=True, load_default=None)
     
 
 class DimensionSchema(Sc):
     class Meta: 
-        strict = True
+        pass
     
     package_height = Float(required=True, error_messages={
         "required": "O campo 'package_height' é obrigatório",
@@ -43,7 +42,7 @@ class DimensionSchema(Sc):
 
 class AdvertisingSchema(Sc):
     class Meta: 
-        strict = True
+        pass
     
     id = String(required=True)
     title = String(required=True, error_messages={
@@ -69,7 +68,7 @@ class AdvertisingSchema(Sc):
 
 class AttributesSchema(Sc):
     class Meta: 
-        strict = True
+        pass
         
     account_id = List(Integer(), required=True, error_messages={
         "required": "O campo 'account_id' é obrigatório",
@@ -82,14 +81,14 @@ class AttributesSchema(Sc):
 
 class AdvertisingReplicateSchema(Sc):
     class Meta:
-        strict = True
+        pass
 
     attributes = Dict(Nested(AttributesSchema, required=True))
     
 
 class MassAlterPriceSchema(Sc):
     class Meta:
-        strict = True
+        pass
 
     advertisings_id = List(Integer(), required=True)
     is_percentage = Boolean(required=True)
@@ -99,7 +98,7 @@ class MassAlterPriceSchema(Sc):
 
 class MassAlterDescription(Sc):
     class Meta:
-        strict = True
+        pass
 
     user_id = Integer(required=True)
     account_id = Integer(required=True)

@@ -6,7 +6,6 @@ from marshmallow_jsonapi.flask import Schema, Relationship
 
 class CreateTagSchema(Schema):
     class Meta:
-        strict = True
         type_ = 'create_tags'
 
     id = String()
@@ -16,7 +15,6 @@ class CreateTagSchema(Schema):
 
 class TagAdvertisingsSchema(Schema):
     class Meta:
-        strict = True
         type_ = 'tag_advertisings'
 
     id = String()
@@ -26,7 +24,6 @@ class TagAdvertisingsSchema(Schema):
 
 class UntagAdvertisingsSchema(Schema):
     class Meta:
-        strict = True
         type_ = 'untag_advertisings'
 
     id = String()
@@ -36,7 +33,6 @@ class UntagAdvertisingsSchema(Schema):
 
 class TagFilesSchema(Schema):
     class Meta:
-        strict = True
         type_ = 'tag_files'
 
     id = String()
@@ -46,7 +42,6 @@ class TagFilesSchema(Schema):
 
 class UntagFilesSchema(Schema):
     class Meta:
-        strict = True
         type_ = 'untag_files'
 
     id = String()

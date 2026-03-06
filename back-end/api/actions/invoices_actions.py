@@ -96,7 +96,8 @@ class InvoiceActions(Actions):
             elif internal_order['modules_id']:
                 text += "Pacote Personalizado: "
 
-                modules = self.fetchall(f"SELECT title FROM meuml.modules WHERE id IN ({internal_order['modules_id']})")
+                modules_id_list = [int(m.strip()) for m in internal_order['modules_id'].split(',')]
+                modules = self.fetchall("SELECT title FROM meuml.modules WHERE id = ANY(:modules_id)", {'modules_id': modules_id_list})
                 modules = [module['title'] for module in modules]
                 text += ", ".join(modules)
 

@@ -5,7 +5,6 @@ from marshmallow.schema import Schema
 class UsersSchema(Schema):
     class Meta:
         type_ = 'users'
-        strict = True
 
     id = Integer()
     date_created = DateTime()
@@ -18,7 +17,7 @@ class UsersSchema(Schema):
 
 class ConfirmEmailSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     email = String()
     hash = String()
@@ -26,7 +25,7 @@ class ConfirmEmailSchema(Schema):
 
 class UserRegisterSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     # user fields
     email = Email(
@@ -53,7 +52,7 @@ class UserRegisterSchema(Schema):
 
 
     @validates_schema
-    def validate_password(self, data):
+    def validate_password(self, data, **kwargs):
         if data['password'] == '' :
             raise ValidationError("O campo 'password' não pode estar em branco")
         elif len(data['password']) < 6:
@@ -61,7 +60,7 @@ class UserRegisterSchema(Schema):
 
 class UpdateUserNameSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     # user fields
     name = String(
@@ -76,7 +75,7 @@ class UpdateUserNameSchema(Schema):
 
 class UpdatePasswordSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     # user fields
     hash = String(
@@ -114,7 +113,7 @@ class UpdatePasswordSchema(Schema):
 
 
     @validates_schema
-    def validate_numbers(self, data):
+    def validate_numbers(self, data, **kwargs):
         if data['password'] != data['password2']:
             raise ValidationError("Os campos 'password' e 'password2' precisam ser iguais")
 
@@ -123,6 +122,6 @@ class UpdatePasswordSchema(Schema):
 
 class ResendEmailSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     email = String()

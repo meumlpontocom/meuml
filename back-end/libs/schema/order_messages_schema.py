@@ -6,9 +6,8 @@ from marshmallow_jsonapi.flask import Schema, Relationship
 
 class NewMessageOrderSchema(Schema):
     class Meta:
-        strict = True
         type_ = 'new_order_message'
 
     id = String()
-    text = String(default=None, required=True) 
-    attachments = List(String(), default=None, required=False, allow_none=True)
+    text = String(dump_default=None, required=True) 
+    attachments = List(String(), dump_default=None, required=False, allow_none=True)

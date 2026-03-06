@@ -225,12 +225,13 @@ class ArticleActions(Actions):
         try:
             ArticleActions.check_module_permission(self)
 
-            query = f"""
-                SELECT id 
+            sku_list = [article['sku'] for article in self.data['new_article']]
+            query = """
+                SELECT id
                 FROM stock.article ar
-                WHERE ar.user_id = {self.user['id']} AND ar.sku IN ('{ "','".join([article['sku'] for article in self.data['new_article']]) }')
+                WHERE ar.user_id = :user_id AND ar.sku = ANY(:skus)
             """
-            if self.fetchone(query):
+            if self.fetchone(query, {'user_id': self.user['id'], 'skus': sku_list}):
                 self.abort_json({
                     'message': f'SKU já existente!',
                     'status': 'error',
@@ -348,69 +349,80 @@ class ArticleActions(Actions):
                 raise Exception
 
             # Remove atributos não reenviados
-            attributes_id = [str(attribute['id']) for attribute in self.data['attributes'] if attribute['id'] is not None]
-            attribute_query = f"""
-                DELETE FROM stock.article_attr 
-                WHERE article_id = {id}
-            """
+            attributes_id = [int(attribute['id']) for attribute in self.data['attributes'] if attribute['id'] is not None]
             if len(attributes_id) > 0:
-                attribute_query += " AND id NOT IN ({','.join(attributes_id)})"
-            self.execute(attribute_query)
+                attribute_query = """
+                    DELETE FROM stock.article_attr
+                    WHERE article_id = :article_id AND id != ALL(:attributes_id)
+                """
+                self.execute(attribute_query, {'article_id': id, 'attributes_id': attributes_id})
+            else:
+                attribute_query = """
+                    DELETE FROM stock.article_attr
+                    WHERE article_id = :article_id
+                """
+                self.execute(attribute_query, {'article_id': id})
 
             # Atualiza atributos
-            attribute_values = []
             for attribute in self.data['attributes']:
                 if attribute['id'] is not None:
-                    attribute_values.append(f" ({attribute['id']}, '{attribute['field']}', '{attribute['value']}') ")
-            
-            attribute_query = f"""
-                UPDATE stock.article_attr AS aa SET
-                    field = updt_aa.field,
-                    value =  updt_aa.value
-                FROM (VALUES
-                    {','.join(attribute_values)}
-                ) AS updt_aa(id, field, value)
-                WHERE aa.id = updt_aa.id AND aa.article_id = {id}
-            """
-            self.execute(attribute_query)
+                    attribute_query = """
+                        UPDATE stock.article_attr AS aa SET
+                            field = :field,
+                            value = :value
+                        WHERE aa.id = :attr_id AND aa.article_id = :article_id
+                    """
+                    self.execute(attribute_query, {
+                        'attr_id': attribute['id'],
+                        'field': attribute['field'],
+                        'value': attribute['value'],
+                        'article_id': id
+                    })
 
             # Insere novos atributos
-            attribute_query = """
-                INSERT INTO stock.article_attr (article_id, field, value) 
-                VALUES 
-            """
-            attribute_values = []
             for attribute in self.data['attributes']:
                 if attribute['id'] is None:
-                    attribute_values.append(f" ({id}, '{attribute['field']}', '{attribute['value']}') ")
-            
-            if len(attribute_values) > 0:
-                attribute_query += ','.join(attribute_values)
-                self.execute(attribute_query)
+                    attribute_query = """
+                        INSERT INTO stock.article_attr (article_id, field, value)
+                        VALUES (:article_id, :field, :value)
+                    """
+                    self.execute(attribute_query, {
+                        'article_id': id,
+                        'field': attribute['field'],
+                        'value': attribute['value']
+                    })
 
             # Remove imagens não reenviadas
-            images_id = [str(image['id']) for image in self.data['images']]
-            delete_image_query = f"""
-                DELETE FROM stock.article_images 
-                WHERE article_id = {id}
-            """
+            images_id = [int(image['id']) for image in self.data['images']]
             if len(images_id) > 0:
-                delete_image_query += " AND image_id NOT IN ({','.join(images_id)})"
-            self.execute(delete_image_query)
+                delete_image_query = """
+                    DELETE FROM stock.article_images
+                    WHERE article_id = :article_id AND image_id != ALL(:images_id)
+                """
+                self.execute(delete_image_query, {'article_id': id, 'images_id': images_id})
+            else:
+                delete_image_query = """
+                    DELETE FROM stock.article_images
+                    WHERE article_id = :article_id
+                """
+                self.execute(delete_image_query, {'article_id': id})
 
             # Upsert de imagens da requisição
             image_query = """
                 INSERT INTO stock.article_images (article_id, image_id, is_main_image) 
                 VALUES 
             """
-            image_values = []
             for image in self.data['images']:
-                image_values.append(f" ({id}, {image['id']}, {image['is_main_image']}) ")
-            
-            if len(image_values) > 0:
-                image_query += ','.join(image_values)
-                image_query += ' ON CONFLICT (article_id, image_id) DO UPDATE SET is_main_image = excluded.is_main_image'
-                self.execute(image_query)
+                image_query_single = """
+                    INSERT INTO stock.article_images (article_id, image_id, is_main_image)
+                    VALUES (:article_id, :image_id, :is_main_image)
+                    ON CONFLICT (article_id, image_id) DO UPDATE SET is_main_image = excluded.is_main_image
+                """
+                self.execute(image_query_single, {
+                    'article_id': id,
+                    'image_id': image['id'],
+                    'is_main_image': image['is_main_image']
+                })
 
             return self.return_success("Produto atualizado com sucesso")
 
@@ -496,14 +508,14 @@ class ArticleActions(Actions):
             
             self.validate(EditArticleSkuSchema())
 
-            existing_article = self.fetchone(f"SELECT id, name FROM stock.article WHERE sku = :new_sku AND user_id = {self.user['id']}", {'new_sku': self.data['new_sku']})
+            existing_article = self.fetchone("SELECT id, name FROM stock.article WHERE sku = :new_sku AND user_id = :user_id", {'new_sku': self.data['new_sku'], 'user_id': self.user['id']})
             if existing_article:
                 self.abort_json({
                     'message': f'Você já possui um produto com o novo SKU informado! (#{existing_article["id"]} - {existing_article["name"]})',
                     'status': 'error',
                 }, 400)
             
-            article = self.fetchone(f"SELECT id, name, is_parent FROM stock.article WHERE id = :id AND user_id = {self.user['id']}", {'id': self.data['id']})            
+            article = self.fetchone("SELECT id, name, is_parent FROM stock.article WHERE id = :id AND user_id = :user_id", {'id': self.data['id'], 'user_id': self.user['id']})            
             if not article:
                 self.abort_json({
                     'message': f'Produto não encontrado',

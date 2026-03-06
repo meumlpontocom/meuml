@@ -7,18 +7,18 @@ from marshmallow import validates_schema, ValidationError
 
 class FaqSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     hide_question = Boolean(
         required=False,
-        default=False,
-        missing=False,
+        dump_default=False,
+        load_default=False,
     )
 
     position = Integer(
         required=False,
         allow_none=None,
-        missing=None
+        load_default=None
     )
 
     question = String(
@@ -31,13 +31,13 @@ class FaqSchema(Schema):
     answer = String(
         required=False,
         allow_none=None,
-        missing=None
+        load_default=None
     )
 
     video_url = String(
         required=False,
         allow_none=None,
-        missing=None
+        load_default=None
     )
 
     tag = String(

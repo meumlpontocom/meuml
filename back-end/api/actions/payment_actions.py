@@ -445,7 +445,8 @@ class PaymentActions(Actions):
                 elif internal_order['modules_id']:
                     text += "Pacote Personalizado\n"
 
-                    modules = self.fetchall(f"SELECT title, price FROM meuml.modules WHERE id IN ({internal_order['modules_id']})")
+                    modules_id_list = [int(m.strip()) for m in internal_order['modules_id'].split(',')]
+                    modules = self.fetchall("SELECT title, price FROM meuml.modules WHERE id = ANY(:modules_id)", {'modules_id': modules_id_list})
                     for module in modules:
                         text += f"{module['title']}\t\tR$ {str(module['price']).replace('.',',')}\n"
 

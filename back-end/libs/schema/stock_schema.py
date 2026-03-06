@@ -7,7 +7,7 @@ from marshmallow import validates_schema, ValidationError
 
 class StockInSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     warehouse_id = Integer(
         required=True,
@@ -27,13 +27,13 @@ class StockInSchema(Schema):
             'required' : "O campo 'preço' é obrigatório"
         }
     )
-    expiration_date = Date(format='%d/%m/%Y', required=False, allow_none=True, missing=None)
-    buy_id = String(required=False, allow_none=True, missing=None)
+    expiration_date = Date(format='%d/%m/%Y', required=False, allow_none=True, load_default=None)
+    buy_id = String(required=False, allow_none=True, load_default=None)
 
 
 class StockOutSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     warehouse_id = Integer(
         required=True,
@@ -53,19 +53,19 @@ class StockOutSchema(Schema):
             'required' : "O campo 'preço' é obrigatório"
         }
     )
-    stock_item_id = Integer(required=False, allow_none=True, missing=None)
-    sell_id = String(required=False, allow_none=True, missing=None)
+    stock_item_id = Integer(required=False, allow_none=True, load_default=None)
+    sell_id = String(required=False, allow_none=True, load_default=None)
     marketplace_id = Integer(
         required=True,
         error_messages={
             'required' : "O campo 'canal de venda' é obrigatório"
         }
     )
-    account_id = Integer(required=False, allow_none=True, default=None, missing=None)
+    account_id = Integer(required=False, allow_none=True, dump_default=None, load_default=None)
 
 class StockItemSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     warehouse_id = Integer(
         required=True,
@@ -85,12 +85,12 @@ class StockItemSchema(Schema):
             'required' : "O campo 'preço' é obrigatório"
         }
     )
-    expiration_date = Date(format='%d/%m/%Y', required=False, allow_none=True, missing=None)
+    expiration_date = Date(format='%d/%m/%Y', required=False, allow_none=True, load_default=None)
 
 
 class StockSchema(Schema):
     class Meta:
-        strict = True
+        pass
     
     items = List(
         Nested(StockItemSchema),

@@ -222,7 +222,7 @@ def update_process_item(
                 tool = action.fetchone(query)
 
                 vacation = action.fetchone(
-                    f"SELECT * FROM meuml.vacations WHERE id={process_data['related_id']} "
+                    "SELECT * FROM meuml.vacations WHERE id = :id", {'id': process_data['related_id']}
                 )
                 filter_query = f"""
                     WHERE ac.user_id = :user_id AND EXISTS (
@@ -246,28 +246,28 @@ def update_process_item(
                 or process_data["tool_id"] == VACATION_UNPAUSE
                 or process_data["tool_id"] == VACATION_REMOVE_MANUFACTURING_TIME
             ):
-                query = f"SELECT count(*) FROM meuml.process_items WHERE process_id = {process_data['id']} AND http_status=429"
-                count = action.fetchone(query)
+                query = "SELECT count(*) FROM meuml.process_items WHERE process_id = :process_id AND http_status=429"
+                count = action.fetchone(query, {'process_id': process_data['id']})
                 if count and count["count"] > 0:
                     if process_data["tool_id"] == VACATION_PAUSE:
                         action.execute(
-                            f"UPDATE meuml.vacations SET pending_start=TRUE WHERE id = {process_data['related_id']}"
+                            "UPDATE meuml.vacations SET pending_start=TRUE WHERE id = :id", {'id': process_data['related_id']}
                         )
                     else:
                         action.execute(
-                            f"UPDATE meuml.vacations SET pending_finish=TRUE WHERE id = {process_data['related_id']}"
+                            "UPDATE meuml.vacations SET pending_finish=TRUE WHERE id = :id", {'id': process_data['related_id']}
                         )
                 else:
                     if process_data["tool_id"] == VACATION_PAUSE:
                         action.execute(
-                            f"UPDATE meuml.vacations SET pending_start=FALSE WHERE id = {process_data['related_id']}"
+                            "UPDATE meuml.vacations SET pending_start=FALSE WHERE id = :id", {'id': process_data['related_id']}
                         )
                     else:
                         action.execute(
-                            f"UPDATE meuml.vacations SET pending_finish=FALSE, has_finished = TRUE WHERE id = {process_data['related_id']}"
+                            "UPDATE meuml.vacations SET pending_finish=FALSE, has_finished = TRUE WHERE id = :id", {'id': process_data['related_id']}
                         )
                         vacation = action.fetchone(
-                            f"SELECT id, user_id, tag_id FROM meuml.vacations WHERE id={process_data['related_id']} "
+                            "SELECT id, user_id, tag_id FROM meuml.vacations WHERE id = :id", {'id': process_data['related_id']}
                         )
                         vacation_remove_tag = queue.signature(
                             "local_priority:vacation_remove_tag"

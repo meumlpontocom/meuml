@@ -135,7 +135,7 @@ def advertising_sku_set_item(account_id: int, tool: dict, process_item_id: int, 
         if response.status_code == 200:
             message = f'Alteração SKU Anúncio #{ml_item_id} - SKU modificado com sucesso.'
             update_process_item(process_item_id, response, True, action, message) 
-            action.execute(f"UPDATE meuml.advertisings SET sku = :sku WHERE external_id = '{ml_item_id}'", {'sku': sku})    
+            action.execute("UPDATE meuml.advertisings SET sku = :sku WHERE external_id = :external_id", {'sku': sku, 'external_id': ml_item_id})    
             
     except:
         LOGGER.error(traceback.format_exc())

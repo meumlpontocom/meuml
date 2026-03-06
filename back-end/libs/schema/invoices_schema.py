@@ -6,22 +6,21 @@ from marshmallow_jsonapi.flask import Schema, Relationship
 
 class NewInvoiceSchema(Schema):
     class Meta:
-        strict = True
         type_ = 'new_invoice'
 
     id = String()
-    internal_order_id = Integer(default=None, required=True)
-    cpf_cnpj = String(default=None, required=True) 
-    razao_social = String(default=None, required=True) 
-    inscricao_municipal = String(default=None, required=False, allow_none=True, missing=None) 
-    email = String(default=None, required=True) 
-    descricao_cidade = String(default=None, required=True) 
-    cep = String(default=None, required=True) 
-    tipo_logradouro = String(default=None, required=True) 
-    logradouro = String(default=None, required=True) 
-    tipo_bairro = String(default=None, required=True) 
-    codigo_cidade = String(default=None, required=True) 
-    complemento = String(default=None, required=False, allow_none=True) 
-    estado = String(default=None, required=True) 
-    numero = String(default=None, required=True) 
-    bairro = String(default=None, required=True) 
+    internal_order_id = Integer(dump_default=None, required=True)
+    cpf_cnpj = String(dump_default=None, required=True) 
+    razao_social = String(dump_default=None, required=True) 
+    inscricao_municipal = String(dump_default=None, required=False, allow_none=True, load_default=None) 
+    email = String(dump_default=None, required=True) 
+    descricao_cidade = String(dump_default=None, required=True) 
+    cep = String(dump_default=None, required=True) 
+    tipo_logradouro = String(dump_default=None, required=True) 
+    logradouro = String(dump_default=None, required=True) 
+    tipo_bairro = String(dump_default=None, required=True) 
+    codigo_cidade = String(dump_default=None, required=True) 
+    complemento = String(dump_default=None, required=False, allow_none=True) 
+    estado = String(dump_default=None, required=True) 
+    numero = String(dump_default=None, required=True) 
+    bairro = String(dump_default=None, required=True) 

@@ -19,13 +19,13 @@ class WarehouseActions(Actions):
         try:
             WarehouseActions.check_module_permission(self)
 
-            query = f"""
-                SELECT id, code, name, is_default 
-                FROM stock.warehouses 
-                WHERE user_id = {self.user['id']}
+            query = """
+                SELECT id, code, name, is_default
+                FROM stock.warehouses
+                WHERE user_id = :user_id
             """
-            
-            data = self.fetchall(query)
+
+            data = self.fetchall(query, {'user_id': self.user['id']})
 
             return self.return_success("Armazéns listados com sucesso", data=data)
 
@@ -94,14 +94,16 @@ class WarehouseActions(Actions):
         try:
             WarehouseActions.check_module_permission(self)
 
-            query = f"""
-                UPDATE stock.warehouses 
-                SET date_modified = NOW(), name = :name, code = :code  
-                WHERE id = {id} AND user_id = {self.user['id']}
+            query = """
+                UPDATE stock.warehouses
+                SET date_modified = NOW(), name = :name, code = :code
+                WHERE id = :id AND user_id = :user_id
             """
             values = {
-                'name': self.data['name'], 
-                'code': self.data['code']
+                'name': self.data['name'],
+                'code': self.data['code'],
+                'id': id,
+                'user_id': self.user['id']
             }
             
             self.execute(query, values)
@@ -125,13 +127,13 @@ class WarehouseActions(Actions):
         try:
             WarehouseActions.check_module_permission(self)
 
-            query = f"""
-                DELETE FROM stock.warehouses   
-                WHERE id = {id} AND user_id = {self.user['id']} AND is_default IS NOT TRUE
-                RETURNING id 
+            query = """
+                DELETE FROM stock.warehouses
+                WHERE id = :id AND user_id = :user_id AND is_default IS NOT TRUE
+                RETURNING id
             """
-            
-            if self.execute_returning(query, raise_exception=True):
+
+            if self.execute_returning(query, {'id': id, 'user_id': self.user['id']}, raise_exception=True):
                 return self.return_success("Armazém excluído com sucesso")
             else:
                 raise Exception
@@ -160,12 +162,12 @@ class WarehouseActions(Actions):
         try:
             WarehouseActions.check_module_permission(self)
 
-            query = f"""
-                SELECT * 
-                FROM stock.account_warehouse aw 
-                WHERE aw.user_id = {self.user['id']}
+            query = """
+                SELECT *
+                FROM stock.account_warehouse aw
+                WHERE aw.user_id = :user_id
             """
-            accounts_warehouse = self.fetchall(query)
+            accounts_warehouse = self.fetchall(query, {'user_id': self.user['id']})
 
             for account_warehouse in accounts_warehouse:
                 if self.data['marketplace_id'] == account_warehouse['marketplace_id'] and self.data['account_id'] == account_warehouse['account_id']:

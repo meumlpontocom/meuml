@@ -66,25 +66,32 @@ class CategoriesActions(Actions):
                 if offset < 0:
                     offset = 0
 
+            ALLOWED_SORT_ORDERS = {'asc', 'desc'}
             if 'sortOrder' in request.args:
-                sortOrder = str(request.args['sortOrder'])
+                sortOrder = str(request.args['sortOrder']).lower()
+                if sortOrder not in ALLOWED_SORT_ORDERS:
+                    sortOrder = 'asc'
             else:
                 sortOrder = 'asc'
 
+            fields = ['id', 'date_created', 'batch', 'path', 'name', 'external_id', 'has_shipping_data', 'has_children', 'height', 'weight', 'width', 'length', 'cubage', 'highest_dimension']
             if 'sortName' in request.args:
                 sortName = str(request.args['sortName'])
+                if sortName not in fields:
+                    sortName = 'id'
             else:
                 sortName = 'id'
-            fields = ['id', 'date_created', 'batch', 'path', 'name', 'external_id', 'has_shipping_data', 'has_children', 'height', 'weight', 'width', 'length', 'cubage', 'highest_dimension']
             fields_str = ','.join(fields)
             query_str = 'SELECT ' + fields_str +'  FROM meuml.ml_categories WHERE '
+            filter_values = {}
 
             if 'filter' in request.args:
                 query_str += ' weight is not null and '
 
-                query_str += f" upper(path) LIKE upper('%%{request.args['filter']}%%') "
+                query_str += " upper(path) LIKE upper(:filter_val) "
+                filter_values = {'filter_val': f"%%{request.args['filter']}%%"}
                 try:
-                    total = self.fetchone(f"SELECT count(id) FROM meuml.ml_categories WHERE weight is not null and upper(path) LIKE upper('%%{request.args['filter']}%%') ", {})
+                    total = self.fetchone("SELECT count(id) FROM meuml.ml_categories WHERE weight is not null and upper(path) LIKE upper(:filter_val)", filter_values)
                 except Exception as e:
                     print(e)
             else:
@@ -103,10 +110,12 @@ class CategoriesActions(Actions):
             if sortName != 'id':
                 query_str += ',id DESC'
 
-            query_str += f' offset {offset} rows fetch next {limit} rows only'
+            filter_values['offset'] = offset
+            filter_values['limit'] = limit
+            query_str += ' offset :offset rows fetch next :limit rows only'
 
             try:
-                categories = self.fetchall(query_str, {})
+                categories = self.fetchall(query_str, filter_values)
             except Exception as e:
                 print(e)
                 self.abort_json({

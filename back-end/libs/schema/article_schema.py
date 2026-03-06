@@ -7,7 +7,7 @@ from marshmallow import validates_schema, ValidationError
 
 class ArticleVariationParentSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     parent_id = Integer(
         required=True,
@@ -19,13 +19,13 @@ class ArticleVariationParentSchema(Schema):
 
 class ArticleAttributeSchema(Schema):
     class Meta:
-        strict = True
+        pass
     
     id = Integer(
         required=False,
         allow_none=True,
-        default=None,
-        missing=None,
+        dump_default=None,
+        load_default=None,
     )
 
     field = String(
@@ -46,7 +46,7 @@ class ArticleAttributeSchema(Schema):
 
 class ArticleImageSchema(Schema):
     class Meta:
-        strict = True
+        pass
     
     id = Integer(
         required=True,
@@ -59,7 +59,7 @@ class ArticleImageSchema(Schema):
 
 class ArticleSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     name = String(
         validate=Length(min=1),
@@ -73,16 +73,16 @@ class ArticleSchema(Schema):
         validate=Length(min=1),
         required=False,
         allow_none=True,
-        default=None,
-        missing=None,
+        dump_default=None,
+        load_default=None,
     )
 
     description = String(
         validate=Length(min=1),
         required=False,
         allow_none=True,
-        default=None,
-        missing=None,
+        dump_default=None,
+        load_default=None,
     )
 
     has_expiration_date = Boolean(
@@ -120,7 +120,7 @@ class ArticleSchema(Schema):
 
 class NewArticleSchema(Schema):
     class Meta:
-        strict = True
+        pass
     
     new_article = List(
         Nested(ArticleSchema),
@@ -136,8 +136,8 @@ class NewArticleSchema(Schema):
         ArticleVariationParentSchema,
         required=False,
         allow_none=True,
-        default=None,
-        missing=None,
+        dump_default=None,
+        load_default=None,
     )
 
     # @validates_schema
@@ -156,7 +156,7 @@ class NewArticleSchema(Schema):
 
 class EditArticleSkuSchema(Schema):
     class Meta:
-        strict = True
+        pass
     
     id = Integer(
         required=True,

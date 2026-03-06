@@ -9,10 +9,7 @@ from typing import Any
 from marshmallow.schema import Schema
 from marshmallow import ValidationError
 from flask import request, abort, make_response, jsonify
-try:
-    from flask import _app_ctx_stack as ctx_stack
-except ImportError:  # pragma: no cover
-    from flask import _request_ctx_stack as ctx_stack
+from libs.context import ctx_stack
 
 from libs.actions.actions import Actions
 
@@ -370,17 +367,12 @@ class QueueActions(Actions):
                 }, 400)
 
             if isinstance(json_data, dict):
-                data, errors = schema.load(json_data)
+                data = schema.load(json_data)
             else:
                 data = []
                 for obj in json_data:
-                    objs, errors = schema.load(obj)
+                    objs = schema.load(obj)
                     data.append(objs)
-                    if errors:
-                        return self.abort_json({
-                            'message': f'Requisição inválida',
-                            'status': 'error'
-                        }, 422)
 
             self.data = data
         except ValidationError as err:

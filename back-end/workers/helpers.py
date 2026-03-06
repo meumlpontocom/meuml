@@ -52,12 +52,12 @@ def invalid_access_token(action, account_id, user_id, name):
 
 
 def search_customers_account_list(account_id, action):
-    accounts_query = f"""
+    accounts_query = """
         SELECT id, access_token, access_token_expires_at, refresh_token
         FROM meuml.accounts
-        WHERE id = {account_id}
+        WHERE id = :account_id
     """
-    ml_accounts = action.fetchall(accounts_query)
+    ml_accounts = action.fetchall(accounts_query, {'account_id': account_id})
     accounts_token = [refresh_token(account, action)
                       for account in ml_accounts]
     accounts_token = [token for token in accounts_token if token]
@@ -91,7 +91,10 @@ def search_customer_account(pool, customer_id, action=None, access_token=None, s
         ml_api = MercadoLibreApi(access_token=access_token)
 
         if not skip_db:
+            ALLOWED_CUSTOMER_FIELDS = {'id', 'external_name'}
             field = 'id' if str(customer_id).isdigit() else 'external_name'
+            if field not in ALLOWED_CUSTOMER_FIELDS:
+                raise ValueError(f'Invalid field: {field}')
             query = f'SELECT id, external_name FROM meuml.customers WHERE {field} = :customer'
             user = action.fetchone(query, {'customer': customer_id})
         else:
@@ -412,7 +415,7 @@ def refresh_token_mercadolibre(account, action: QueueActions, force=False):
             action.execute(query, {'expired_status': 0, 'id': account['id']})
 
             account = action.fetchone(
-                f"SELECT id, user_id, name FROM meuml.accounts WHERE id = {account['id']}")
+                "SELECT id, user_id, name FROM meuml.accounts WHERE id = :id", {'id': account['id']})
 
             send_notification(
                 str(account['user_id']),
@@ -438,7 +441,7 @@ def refresh_token_mercadolibre(account, action: QueueActions, force=False):
         action.execute(query, {'expired_status': 0, 'id': account['id']})
 
         account = action.fetchone(
-            f"SELECT id, user_id, name FROM meuml.accounts WHERE id = {account['id']}")
+            "SELECT id, user_id, name FROM meuml.accounts WHERE id = :id", {'id': account['id']})
 
         send_notification(
             str(account['user_id']),
@@ -513,12 +516,12 @@ def get_accounts(action, accounts_id, platform="ML"):
 
 
 def get_accounts_shopee(action, accounts_id):
-    query = f"""
+    query = """
         SELECT *
         FROM shopee.accounts
-        WHERE id IN ({','.join([str(account_id) for account_id in accounts_id])})
+        WHERE id = ANY(:ids)
     """
-    accounts = action.fetchall(query)
+    accounts = action.fetchall(query, {'ids': [int(account_id) for account_id in accounts_id]})
 
     accounts_dict = {}
     for account in accounts:
@@ -539,15 +542,15 @@ def get_accounts_shopee(action, accounts_id):
 
 
 def get_accounts_mercadolibre(action, accounts_id):
-    query = f"""
+    query = """
         SELECT id, user_id, name, access_token, refresh_token, access_token_expires_at,
-            external_data ->> 'user_type' as user_type, 
+            external_data ->> 'user_type' as user_type,
             external_data -> 'company' ->> 'brand_name' as brand_name,
             external_data->>'tags' as account_tags
         FROM meuml.accounts
-        WHERE id IN ({','.join([str(account_id) for account_id in accounts_id])})
+        WHERE id = ANY(:ids)
     """
-    accounts = action.fetchall(query)
+    accounts = action.fetchall(query, {'ids': [int(account_id) for account_id in accounts_id]})
 
     accounts_dict = {}
     for account in accounts:

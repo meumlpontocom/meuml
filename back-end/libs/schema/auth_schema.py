@@ -6,7 +6,7 @@ from marshmallow.schema import Schema
 
 class LoginSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     email = String(
         required=True,
@@ -26,7 +26,7 @@ class LoginSchema(Schema):
 class EmailSchema(Schema):
 
     class Meta:
-        strict = True
+        pass
 
     email = Email(
         required=True,
@@ -40,7 +40,7 @@ class EmailSchema(Schema):
 
 class ConfirmEmailSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     email = Email(
         required=True,
@@ -60,7 +60,7 @@ class ConfirmEmailSchema(Schema):
 
 class ResetPasswordSchema(Schema):
     class Meta:
-        strict = True
+        pass
 
     # user fields
     email = String(
@@ -74,7 +74,7 @@ class ResetPasswordSchema(Schema):
 
 class SaveDeviceToken(Schema):
     class Meta:
-        strict = True
+        pass
 
     # user fields
     token = String(

@@ -25,7 +25,7 @@ def advertising_lookup_visits(pool, advertising_id, account_id, last_n_days=1, d
         action.conn = get_conn()
 
         account = action.fetchone(
-            f"SELECT ac.id, ac.access_token, ac.access_token_expires_at, ac.refresh_token, ac.user_id, ac.name FROM meuml.accounts ac WHERE ac.id = {account_id}")
+            "SELECT ac.id, ac.access_token, ac.access_token_expires_at, ac.refresh_token, ac.user_id, ac.name FROM meuml.accounts ac WHERE ac.id = :account_id", {'account_id': account_id})
 
         if account is None:
             return
@@ -256,20 +256,20 @@ def update_accounts_visits(accounts, pool, date_id=None):
                 results = response.json().get('results', [])
 
                 if len(results) > 0:
-                    query = f"""
-                        INSERT INTO dw.f_account_visits (account_id, data_id, qtd_visitas, active_advertisings) 
-                            SELECT 
-                                {account['id']} as account_id, 
-                                {date_id} as data_id, 
-                                {results[0]['total']} as qtd_visitas, 
+                    query = """
+                        INSERT INTO dw.f_account_visits (account_id, data_id, qtd_visitas, active_advertisings)
+                            SELECT
+                                :account_id as account_id,
+                                :data_id as data_id,
+                                :qtd_visitas as qtd_visitas,
                                 count(ad.id) as active_advertisings
-                            FROM meuml.advertisings ad 
-                            WHERE ad.status = 'active' AND ad.account_id = {account['id']}  
-                        ON CONFLICT (account_id, data_id) 
-                        DO UPDATE SET 
+                            FROM meuml.advertisings ad
+                            WHERE ad.status = 'active' AND ad.account_id = :account_id
+                        ON CONFLICT (account_id, data_id)
+                        DO UPDATE SET
                             qtd_visitas=EXCLUDED.qtd_visitas
                     """
-                    action.execute(query)
+                    action.execute(query, {'account_id': account['id'], 'data_id': date_id, 'qtd_visitas': results[0]['total']})
     except Exception as e:
         LOGGER.error(traceback.format_exc())
         log_daily_routine({
@@ -304,7 +304,7 @@ def advertisings_position_finder(pool):
         if len(subscripted_accounts) > 0:
             yesterday = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')
             date_id = action.fetchone(
-                f"SELECT dw.get_data_id('{yesterday}') as initial")
+                "SELECT dw.get_data_id(:yesterday) as initial", {'yesterday': yesterday})
             date_id = date_id['initial']
 
             update_accounts_visits(subscripted_accounts, pool, date_id)
@@ -325,7 +325,7 @@ def advertisings_position_finder(pool):
                          ).strftime('%Y-%m-%d')
             today = date.today().strftime('%Y-%m-%d')
             date_ids = action.fetchall(
-                f"SELECT id, TO_CHAR(data_date, \'YYYY-MM-DD\') as data_date FROM dw.dim_datas WHERE data_date >= '{last_year}' AND data_date <= '{today}'")
+                "SELECT id, TO_CHAR(data_date, 'YYYY-MM-DD') as data_date FROM dw.dim_datas WHERE data_date >= :last_year AND data_date <= :today", {'last_year': last_year, 'today': today})
             date_ids = {date_id['data_date']: date_id['id']
                         for date_id in date_ids}
 
@@ -374,16 +374,16 @@ def visits_complete_history_lookup(pool, account_id):
         last_year = (date.today() - timedelta(days=395)).strftime('%Y-%m-%d')
         today = date.today().strftime('%Y-%m-%d')
         date_ids = action.fetchall(
-            f"SELECT id, TO_CHAR(data_date, \'YYYY-MM-DD\') as data_date FROM dw.dim_datas WHERE data_date >= '{last_year}' AND data_date <= '{today}'")
+            "SELECT id, TO_CHAR(data_date, 'YYYY-MM-DD') as data_date FROM dw.dim_datas WHERE data_date >= :last_year AND data_date <= :today", {'last_year': last_year, 'today': today})
         date_ids = {date_id['data_date']: date_id['id']
                     for date_id in date_ids}
 
-        account_query = f"""
-            SELECT ac.id, ac.access_token, ac.access_token_expires_at, ac.refresh_token, ac.user_id, ac.name  
-            FROM meuml.accounts ac 
-            WHERE ac.id = {account_id}
+        account_query = """
+            SELECT ac.id, ac.access_token, ac.access_token_expires_at, ac.refresh_token, ac.user_id, ac.name
+            FROM meuml.accounts ac
+            WHERE ac.id = :account_id
         """
-        account = action.fetchone(account_query)
+        account = action.fetchone(account_query, {'account_id': account_id})
 
         if account is None:
             return

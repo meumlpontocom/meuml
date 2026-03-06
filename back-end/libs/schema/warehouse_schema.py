@@ -20,8 +20,8 @@ class WarehouseSchema(Schema):
 
     is_default = Boolean (
         required=False,
-        default=False,
-        missing=False
+        dump_default=False,
+        load_default=False
     )
 
 

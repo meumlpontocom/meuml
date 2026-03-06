@@ -43,7 +43,7 @@ def process_deauthorization(data):
         """
         action.execute(query, {'id': data['shop_id']})
 
-        account = action.fetchone(f"SELECT id, user_id, name FROM shopee.accounts WHERE id = {data['shop_id']}")
+        account = action.fetchone("SELECT id, user_id, name FROM shopee.accounts WHERE id = :id", {'id': data['shop_id']})
 
         send_notification(str(account['user_id']), {'title': 'MeuML - conta Shopee perdeu autenticação', 'url': '/contas', 'body': f'A conta {account["name"]} da Shopee perdeu autenticação. Por favor, faça login e autorize novamente a integração com o MeuML'})
 

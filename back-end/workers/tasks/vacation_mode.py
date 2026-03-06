@@ -34,30 +34,30 @@ def vacation_bihourly_check_start_pending():
                 WHERE su.package_id = 2 OR string_to_array(su.modules, ',') @> array['6']
                 GROUP BY sa.account_id 
             ) subquery ON subquery.account_id = vc.account_id 
-            WHERE has_started IS TRUE AND pending_start IS TRUE AND vacation_type = {PAUSADOS} AND date_modified < (now() - interval '1' day) AND has_finished IS FALSE
+            WHERE has_started IS TRUE AND pending_start IS TRUE AND vacation_type = :vacation_type AND date_modified < (now() - interval '1' day) AND has_finished IS FALSE
         """
-        vacations = action.fetchall(query)
+        vacations = action.fetchall(query, {'vacation_type': PAUSADOS})
 
         for vacation in vacations:
             if vacation['expiration_date'] > datetime.now():
-                user_id = vacation['user_id'] 
+                user_id = vacation['user_id']
                 vacation_id = vacation['id']
                 tag_id = vacation['tag_id']
 
                 filter_query = f"""
                     WHERE ac.user_id = :user_id AND ad.status = 'active' AND EXISTS (
                         SELECT ti3.id
-                        FROM meuml.tagged_items ti3 
-                        WHERE ti3.tag_id = {tag_id} AND ti3.item_id = ad.external_id 
-                    ) GROUP BY ad.id, ac.id 
+                        FROM meuml.tagged_items ti3
+                        WHERE ti3.tag_id = {tag_id} AND ti3.item_id = ad.external_id
+                    ) GROUP BY ad.id, ac.id
                 """
                 filter_values = {'user_id': user_id}
 
-                update_query = f"UPDATE meuml.vacations SET date_modified=NOW() WHERE id = {vacation['id']}"
+                update_query = "UPDATE meuml.vacations SET date_modified=NOW() WHERE id = :id"
                 tool = get_tool(action, 'vacation-pause')
                 advertising_status_set_many = queue.signature('local_priority:advertising_status_set_many')
                 advertising_status_set_many.delay(user_id=user_id, filter_query=filter_query, filter_values=filter_values, status='paused', tool=tool, related_id=vacation_id)
-                action.execute(update_query)
+                action.execute(update_query, {'id': vacation['id']})
             else:
                 tool_id = TOOL_ID_PAUSAR if vacation['vacation_type'] == PAUSADOS else TOOL_ID_PRAZO
                 process_id = create_process(vacation['account_id'], vacation['user_id'], tool_id, 0, 1, action)
@@ -105,8 +105,8 @@ def vacation_bihourly_check_end_pending():
                     filter_values = {'user_id': user_id}
                     tool = get_tool(action, 'vacation-unpause')
                     advertising_status_set_many = queue.signature('local_priority:advertising_status_set_many')
-                    advertising_status_set_many.delay(user_id=user_id, filter_query=filter_query, filter_values=filter_values, status='active', tool=tool, related_id=vacation_id) 
-                    action.execute(f"UPDATE meuml.vacations SET date_modified=NOW() WHERE id = {vacation['id']}")
+                    advertising_status_set_many.delay(user_id=user_id, filter_query=filter_query, filter_values=filter_values, status='active', tool=tool, related_id=vacation_id)
+                    action.execute("UPDATE meuml.vacations SET date_modified=NOW() WHERE id = :id", {'id': vacation['id']})
                 else:
                     user_id = vacation['user_id'] 
                     vacation_id = vacation['id']
@@ -123,7 +123,7 @@ def vacation_bihourly_check_end_pending():
                     tool = get_tool(action, 'vacation-remove-manufacturing-time')
                     advertising_manufacturing_time_set_many = queue.signature('local_priority:advertising_manufacturing_time_set_many')
                     advertising_manufacturing_time_set_many.delay(user_id=user_id, filter_query=filter_query, filter_values=filter_values, days=0, tool=tool, related_id=vacation_id)
-                    action.execute(f"UPDATE meuml.vacations SET date_modified=NOW() WHERE id = {vacation['id']}")
+                    action.execute("UPDATE meuml.vacations SET date_modified=NOW() WHERE id = :id", {'id': vacation['id']})
             else:
                 tool_id = TOOL_ID_REMOVER_PAUSA if vacation['vacation_type'] == PAUSADOS else TOOL_ID_REMOVER_PRAZO
                 process_id = create_process(vacation['account_id'], vacation['user_id'], tool_id, 0, 1, action)
@@ -216,9 +216,9 @@ def vacation_daily_check():
                 WHERE su.package_id = 2 OR string_to_array(su.modules, ',') @> array['6']
                 GROUP BY sa.account_id 
             ) subquery ON subquery.account_id = vc.account_id 
-            WHERE vacation_type = {PRAZO_ENVIO} AND has_started IS TRUE AND has_finished IS FALSE
+            WHERE vacation_type = :vacation_type AND has_started IS TRUE AND has_finished IS FALSE
         """
-        vacations = action.fetchall(query)
+        vacations = action.fetchall(query, {'vacation_type': PRAZO_ENVIO})
 
         tool = get_tool(action, 'vacation-manufacturing-time')
         tool_remove = get_tool(action, 'vacation-remove-manufacturing-time')
@@ -241,7 +241,7 @@ def vacation_daily_check():
                 if duration <= PRAZO_MAXIMO and vacation['switch_types'] is True:
                     advertising_manufacturing_time_set_many.delay(user_id=vacation['user_id'], filter_query=filter_query, 
                                                             filter_values=filter_values, days=duration, tool=tool, related_id=vacation['id'])
-                    action.execute(f"UPDATE meuml.vacations SET date_modified=NOW(), switch_types=FALSE WHERE id = {vacation['id']}")
+                    action.execute("UPDATE meuml.vacations SET date_modified=NOW(), switch_types=FALSE WHERE id = :id", {'id': vacation['id']})
                 elif duration <= 0:                    
                     advertising_manufacturing_time_set_many.delay(user_id=vacation['user_id'], filter_query=filter_query, 
                                                             filter_values=filter_values, days=0, tool=tool_remove, related_id=vacation['id'])
@@ -274,8 +274,8 @@ def vacation_apply_tag(user_id: int, filter_query: str, filter_values: dict, vac
             'display_name': 'Anúncios'
         }
 
-        tag_id = action.execute_insert(f"INSERT INTO meuml.tags (user_id, name) VALUES ({user_id}, '{tag_name}') RETURNING id")
-        action.execute(f"UPDATE meuml.vacations SET tag_id = {tag_id} WHERE id = {vacation_id}")
+        tag_id = action.execute_insert("INSERT INTO meuml.tags (user_id, name) VALUES (:user_id, :tag_name) RETURNING id", {'user_id': user_id, 'tag_name': tag_name})
+        action.execute("UPDATE meuml.vacations SET tag_id = :tag_id WHERE id = :vacation_id", {'tag_id': tag_id, 'vacation_id': vacation_id})
         existing_tags = {tag_name: tag_id}
         vacation_id = vacation_id if not starts_at else None
 
@@ -296,7 +296,7 @@ def vacation_mode_activate(user_id, vacation_id, tag_id, conn=None):
         action = QueueActions()
         action.conn = conn if conn else get_conn()
 
-        vacation = action.fetchone(f"SELECT * FROM meuml.vacations WHERE id={vacation_id} AND has_started IS FALSE AND has_finished IS FALSE")
+        vacation = action.fetchone("SELECT * FROM meuml.vacations WHERE id = :id AND has_started IS FALSE AND has_finished IS FALSE", {'id': vacation_id})
         if not vacation:
             return
         
@@ -313,7 +313,7 @@ def vacation_mode_activate(user_id, vacation_id, tag_id, conn=None):
         """
         filter_values = {'user_id': user_id}
 
-        update_query = f"UPDATE meuml.vacations SET has_started = TRUE, date_modified=NOW() WHERE id = {vacation['id']}"
+        update_query = "UPDATE meuml.vacations SET has_started = TRUE, date_modified=NOW() WHERE id = :id"
 
         if vacation['vacation_type'] == PRAZO_ENVIO and duration <= PRAZO_MAXIMO:
             tool = get_tool(action, 'vacation-manufacturing-time')
@@ -322,12 +322,12 @@ def vacation_mode_activate(user_id, vacation_id, tag_id, conn=None):
                                                     filter_values=filter_values, days=duration, tool=tool)
         else:
             if vacation['vacation_type'] == PRAZO_ENVIO:
-                update_query = f"UPDATE meuml.vacations SET has_started = TRUE, date_modified=NOW(), switch_types=TRUE WHERE id = {vacation['id']}"
+                update_query = "UPDATE meuml.vacations SET has_started = TRUE, date_modified=NOW(), switch_types=TRUE WHERE id = :id"
             tool = get_tool(action, 'vacation-pause')
             advertising_status_set_many = queue.signature('local_priority:advertising_status_set_many')
             advertising_status_set_many.delay(user_id=user_id, filter_query=filter_query, filter_values=filter_values, status='paused', tool=tool, related_id=vacation_id)
 
-        action.execute(update_query)
+        action.execute(update_query, {'id': vacation['id']})
 
     except:
         LOGGER.error(traceback.format_exc())
@@ -344,7 +344,7 @@ def vacation_mode_deactivate(user_id, vacation_id, tag_id, flask_action=None):
         else:
             action = flask_action
 
-        vacation = action.fetchone(f"SELECT * FROM meuml.vacations WHERE id={vacation_id} AND has_started IS TRUE AND has_finished IS FALSE")
+        vacation = action.fetchone("SELECT * FROM meuml.vacations WHERE id = :id AND has_started IS TRUE AND has_finished IS FALSE", {'id': vacation_id})
         if not vacation:
             return
 
@@ -372,7 +372,7 @@ def vacation_mode_deactivate(user_id, vacation_id, tag_id, flask_action=None):
             advertising_status_set_many = queue.signature('local_priority:advertising_status_set_many')
             advertising_status_set_many.delay(user_id=user_id, filter_query=filter_query, filter_values=filter_values, status='active', tool=tool, related_id=vacation_id) 
             
-        action.execute(f"UPDATE meuml.vacations SET has_finished = TRUE, date_modified=NOW() WHERE id = {vacation['id']}")
+        action.execute("UPDATE meuml.vacations SET has_finished = TRUE, date_modified=NOW() WHERE id = :id", {'id': vacation['id']})
         return True
     except:
         LOGGER.error(traceback.format_exc())
@@ -387,8 +387,8 @@ def vacation_remove_tag(user_id, tag_id):
         action = QueueActions()
         action.conn = get_conn()
 
-        action.execute(f"DELETE FROM meuml.tagged_items WHERE tag_id = {tag_id}")
-        action.execute(f"DELETE FROM meuml.tags WHERE id = {tag_id}")
+        action.execute("DELETE FROM meuml.tagged_items WHERE tag_id = :tag_id", {'tag_id': tag_id})
+        action.execute("DELETE FROM meuml.tags WHERE id = :id", {'id': tag_id})
 
     except:
         LOGGER.error(traceback.format_exc())
