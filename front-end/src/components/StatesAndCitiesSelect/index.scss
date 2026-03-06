@@ -1,0 +1,6 @@
+$default-picky-selection: #D8DBE0FF;
+$picky-border-color: $default-picky-selection;
+
+#picky {
+  border: 2px solid var(--picky-border-color)!important;
+}

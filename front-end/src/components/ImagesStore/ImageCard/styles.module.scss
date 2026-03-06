@@ -1,0 +1,94 @@
+// .imgCard {
+//   min-width: 272px;
+//   max-width: 272px;
+//   height: 242px;
+//   cursor: pointer;
+
+//   &:hover {
+//     filter: drop-shadow(1px 1px 2px black);
+//   }
+// }
+
+.imagecardWidth {
+  min-width: 272px !important;
+  max-width: 272px !important;
+}
+
+.imagecardContainer {
+  height: 242px;
+  min-width: 242px !important;
+  max-width: 242px !important;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-color: var(--light);
+}
+
+.inputButton {
+  cursor: pointer;
+
+  &:disabled {
+    background-color: #fff;
+  }
+}
+.tagIcon {
+  height: 35px;
+  width: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid;
+  border-radius: 0.25rem 0 0 0.25rem;
+  background: var(--secondary);
+  background-color: #f0f3f5;
+  border-color: #e4e7ea;
+  margin-right: 0;
+  border-right: 0;
+}
+
+.tagInput {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: 195px;
+  height: 35px;
+  border: 1px solid #e4e7ea;
+  border-radius: 0 0.25rem 0.25rem 0;
+  overflow-x: auto;
+  padding-left: 4px;
+  white-space: nowrap;
+  cursor: pointer;
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.imgCardDdmenu {
+  &:hover {
+    box-shadow: 0px 2px 6px 2px rgba(0, 0, 0, 0.1),
+      0px 2px 2px 1px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@media only screen and (max-width: 400px) {
+  .imagecardWidth {
+    min-width: 242px !important;
+    max-width: 242px !important;
+  }
+
+  .imagecardContainer {
+    height: 212px;
+    min-width: 212px !important;
+    max-width: 212px !important;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-color: var(--light);
+  }
+
+  .tagInput {
+    p {
+      font-size: 0.75rem;
+    }
+  }
+}

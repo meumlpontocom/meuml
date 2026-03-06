@@ -1,0 +1,14 @@
+venv*
+.idea*
+.env*
+sendgrid.sh
+__pycache__
+*/*.pyc
+categoriesMLB
+celerybeat-schedule
+celerybeat.pid
+libs/logs/gunicorn.log
+vscode/
+*.log
+*.swp
+certs/*

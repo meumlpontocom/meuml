@@ -1,0 +1,45 @@
+.page-title {
+  color: #20a8d8;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.advertising {
+  font-size: 15px;
+}
+
+.advert-list {
+  margin-left: 2em;
+  margin-bottom: 1.7em;
+}
+
+.advert-owner {
+  color: #4d4d4d;
+}
+
+.advert-list-title {
+  font-size: 18px;
+}
+.allowed-advert {
+  color: forestgreen;
+}
+
+.blocked-advert {
+  color: firebrick;
+}
+
+.saiba-mais {
+  color: #20a8d8;
+  font-size: smaller;
+  cursor: pointer;
+}
+
+.popup {
+}
+.popup-descricao {
+}
+.chamada-acao {
+  color: seagreen;
+  font-weight: 500;
+  margin-top: 1em;
+}

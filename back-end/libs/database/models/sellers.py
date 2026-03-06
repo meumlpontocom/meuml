@@ -1,0 +1,1 @@
+import datetimefrom libs.database.model import Modelfrom libs.database.types import Date, Number, Dateclass Sellers(Model):    __tablename__ = 'sellers'    id = Number(field='id')    date_created = Date(field='date_created', default=datetime.datetime.now())    date_modified = Date(field='date_modified')    subscription_id = Number(field='subscription_id')

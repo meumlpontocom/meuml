@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <style>
+      @media only screen and (max-device-width: 480px) {
+        /* mobile-specific CSS styles go here */
+      }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>MeuML.com - Lembrete: vencimento assinatura</title>
+    <style type="text/css">
+      body {
+        background-color: #e4e5e6;
+        padding: 1% 20%;
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+          "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #404449 !important;
+        text-align: left;
+      }
+      .container {
+        background-color: #ffffff;
+        border: 1px #ccc solid;
+        width: 100%;
+        min-height: 500px;
+      }
+      .conteudo {
+        padding: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .btn {
+        display: inline-block;
+        font-weight: 400;
+        color: #212529;
+        text-align: center;
+        vertical-align: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-color: transparent;
+        border: 1px solid transparent;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+          border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      }
+      .btn-info a {
+        color: #ffffff !important;
+        text-decoration: none !important;
+      }
+      .logo {
+        margin: 25px 30%;
+        width: 40%;
+      }
+      p {
+        text-align: justify;
+        padding: 0 50px;
+      }
+      a {
+        text-decoration: none;
+        background-color: transparent;
+      }
+      .footer {
+        border-top: #ccc solid 1px;
+        padding: 50px;
+        text-align: center;
+      }
+      h1 {
+        font-size: 25px;
+      }
+      .btn-info {
+        color: #fff !important;
+        background-color: #054785;
+        border-color: #366b9d;
+      }
+      .container {
+        background-color: #ffffff;
+        border: 1px #ccc solid;
+        width: 100%;
+        max-width: 740px !important;
+        min-height: 500px;
+      }
+      .table {
+        margin-left:auto; 
+        margin-right:auto;
+        text-align:center;
+        border: 1px #000 solid;
+      }
+
+      table.blueTable {
+        border: 1px solid #1C6EA4;
+        background-color: #EEEEEE;
+        width: 100%;
+        text-align: center;
+        border-collapse: collapse;
+      }
+      table.blueTable td, table.blueTable th {
+        border: 1px solid #AAAAAA;
+        padding: 3px 2px;
+      }
+      table.blueTable tbody td {
+        font-size: 13px;
+      }
+      table.blueTable tr:nth-child(even) {
+        background: #D0E4F5;
+      }
+      table.blueTable thead {
+        background: #054785;
+        border-bottom: 2px solid #444444;
+      }
+      table.blueTable thead th {
+        font-size: 15px;
+        font-weight: bold;
+        color: #FFFFFF;
+        border-left: 2px solid #D0E4F5;
+      }
+      table.blueTable thead th:first-child {
+        border-left: none;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <div class="container ">
+        <div class="header">
+          <!-- Header -->
+          <div class="row">
+            <div class="col-md-12">
+                    <img src="https://app2.meuml.com/static/media/MeuML-logo2.3ad71b9b.png" class="logo"/>
+            </div>
+          </div>
+        </div>
+        <div class="conteudo">
+          <!-- Content -->
+          <h1>Lembrete: vencimento da assinatura</h1>
+          <p>
+            Sua assinatura vence em {{expiration_date}}, com isso voc&#234; perder&#225; o acesso as funcionalidades exclusivas &#224; assinantes do MeuML.  
+          </p>
+          <table class="blueTable">
+            <thead>
+              <tr>
+                <th style="width:200px">Contas</th>
+                <th style="width:50px">Pacote</th>
+                <th style="width:100px">M&#243;dulos</th>
+                <th style="width:50px">Pre&#231;o</th>
+                <th style="width:50px">Vencimento</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{accounts}}</td>
+                <td>{{package}}</td>
+                <td>{{modules}}</td>
+                <td>{{price}}</td>
+                <td>{{expiration_date}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <br/>
+          <p>
+            Não perca o acesso, clique abaixo e renove sua Assinatura!
+          </p>
+          <a href="{{url}}#/assinaturas/planos" class="btn btn-info">
+            Renovar Assinatura
+          </a>
+        </div>
+        <div class="footer">
+          <!-- footer -->
+          <a href="https://www.meuml.com"> www.meuml.com </a> - +55 (41) 99123-0100
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

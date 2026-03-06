@@ -1,0 +1,38 @@
+.selected-img {
+  border: solid #0d86ff 2px;
+}
+
+.default-img {
+  border: solid black 2px;
+}
+
+.carousel-caption {
+  color: #0d86ff;
+  background-color: #ffffff55;
+  font-weight: 700;
+}
+
+.carousel-preview {
+  width: 100%;
+  overflow-y: hidden;
+  height: 130px;
+  scroll-behavior: smooth;
+}
+
+.fake-browse-btn {
+  top: 0px;
+  left: 0px;
+  z-index: 1;
+}
+
+.custom-file {
+  position: relative;
+  text-align: right;
+  opacity: 0;
+  z-index: 2;
+  -moz-opacity: 0;
+}
+
+#inputGroupFile {
+  width: 150px;
+}

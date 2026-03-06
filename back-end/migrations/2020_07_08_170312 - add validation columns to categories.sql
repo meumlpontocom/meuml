@@ -1,0 +1,9 @@
+ALTER TABLE meuml.ml_categories ADD item_conditions jsonb NULL;
+ALTER TABLE meuml.ml_categories ADD shipping_modes jsonb NULL;
+ALTER TABLE meuml.ml_categories ADD minimum_price numeric NULL;
+ALTER TABLE meuml.ml_categories ADD maximum_price numeric NULL;
+ALTER TABLE meuml.ml_categories ADD max_title_length int4 NULL;
+ALTER TABLE meuml.ml_categories ADD max_description_length int4 NULL;
+ALTER TABLE meuml.ml_categories ADD max_pictures_per_item int4 NULL;
+ALTER TABLE meuml.ml_categories ADD max_pictures_per_item_var varchar NULL;
+ALTER TABLE meuml.ml_categories ADD fragile boolean NULL;

@@ -1,0 +1,20 @@
+.category-tree {
+  overflow-y: auto;
+  height: 180px;
+  width: 100%;
+}
+
+.category-tree-item:hover {
+  color: white;
+  background-color: #311ed6;
+}
+
+.category-tree-item:active {
+  color: white;
+  background-color: #2714c7;
+}
+
+.category-tree-item-active {
+  color: white;
+  background-color: #1b0d97;
+}

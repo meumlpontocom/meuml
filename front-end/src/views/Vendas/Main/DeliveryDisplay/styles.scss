@@ -1,0 +1,30 @@
+.delivery-display-container {
+  position: relative;
+  cursor: default;
+}
+
+.delivery-tag {
+  display: block;
+  white-space: nowrap;
+  text-align: center;
+  border-radius: 4px;
+  position: absolute;
+  padding: 0 12px;
+  left: 0;
+  top: -28px;
+  z-index: 9999;
+  height: 24px;
+  opacity: 1;
+  background-color: var(--secondary);
+  border: 1px solid var(--dark);
+  color: var(--dark);
+}
+
+.delivery-badge {
+  padding: 0px 20px;
+  border: 1px solid #4f5d73;
+  border-radius: 4px;
+  color: #4f5d73;
+  line-height: 14px;
+  position: relative;
+}

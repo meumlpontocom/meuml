@@ -1,0 +1,14 @@
+.quality-circle-btn {
+  background-color: #fff;
+  border: none;
+  padding: 0px;
+  border-radius: 100%;
+}
+
+.quality-circle-btn:hover {
+  background-color: #76767622;
+}
+
+.quality-circle-btn:focus {
+  background-color: #76767622;
+}

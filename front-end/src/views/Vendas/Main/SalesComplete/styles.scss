@@ -1,0 +1,30 @@
+$item-body-column: 120px;
+
+.item-body-qty {
+  width: $item-body-column;
+}
+
+.item-body-value {
+  width: $item-body-column;
+}
+
+.payments-complete-column {
+  overflow-y: auto;
+  max-height: 360px;
+}
+
+.payment-single-sale {
+  position: relative;
+  overflow-x: hidden;
+}
+
+.single-sale-badge {
+  position: absolute;
+  right: 0;
+  padding: 0 6px;
+  border-radius: 50%;
+}
+
+.text-overflow-auto {
+  overflow-x: auto;
+}

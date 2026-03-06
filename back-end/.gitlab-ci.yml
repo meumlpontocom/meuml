@@ -1,0 +1,42 @@
+stages:
+  - homologacao
+  - producao
+
+homologacao:
+  stage: homologacao
+  tags:
+    - homolog
+  environment:
+    name: homologacao
+  script:
+    - cd /application/back-end/meuml-v2/
+    - git pull https://ci-homolog-b:ci-homolog-b@gitlab.com/bitflix/meuml-v2.git homolog
+    - git checkout homolog
+    - whoami
+    - pm2 flush
+    - pm2 delete 0 2> /dev/null 
+    - ./start.sh
+    - cd libs/logs/
+    - rm gunicorn.log
+    - touch gunicorn.log
+    - service meuml-flask-gunicorn restart
+  when: manual
+  only:
+    - homolog
+    - merge-request
+
+producao:
+  stage: producao
+  tags:
+    - producao
+    - prod-api
+  environment:
+    name: producao
+  script:
+    - cd /home/oracle/meuml-v2 && git pull origin master && git checkout master
+    - pm2 restart "flask-api-producao"
+  when: manual
+  only:
+    - push
+    - master
+    - merge-request

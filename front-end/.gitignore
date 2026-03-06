@@ -1,0 +1,14 @@
+.idea*
+.env*
+.vscode*
+*.log
+build/
+node_modules*
+package-lock.json
+todo.md
+*.code-workspace
+.DS_Store
+.devcontainer
+*ocker*
+.run
+.fleet

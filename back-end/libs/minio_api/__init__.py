@@ -1,0 +1,1 @@
+from libs.minio_api.minio_api import minio_client

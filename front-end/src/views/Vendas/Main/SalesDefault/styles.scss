@@ -1,0 +1,31 @@
+$infos-height: 53px;
+
+.deliver-details {
+  min-height: $infos-height;
+}
+
+.payment-details {
+  min-height: $infos-height;
+}
+
+.buyer-details {
+  min-height: $infos-height;
+}
+
+.salescard-shipping {
+  padding: 0px 20px;
+  border: 1px solid var(--success);
+  border-radius: 4px;
+  color: var(--dark);
+  line-height: 14px;
+}
+
+.salescard-body-title {
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.items-body-plus {
+  width: 25px;
+  height: 25px;
+}

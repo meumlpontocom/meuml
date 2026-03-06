@@ -1,0 +1,16 @@
+.greenBall {
+  background-color: green;
+  border-radius: 100px;
+}
+.redBall {
+  background-color: red;
+  border-radius: 100px;
+}
+.yellowBall {
+  background-color: yellow;
+  border-radius: 100px;
+}
+.grayBall {
+  background-color: gray;
+  border-radius: 100px;
+}

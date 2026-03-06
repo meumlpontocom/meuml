@@ -1,0 +1,30 @@
+.sales-card {
+  max-width: 1400px;
+}
+
+.salescard-top {
+  background-color: #ebedef;
+
+  button {
+    padding: 0;
+    background-color: #ebedef;
+    border: 0;
+    align-self: center;
+
+    &:hover {
+      background-color: #ebedef;
+    }
+  }
+}
+
+.items-header {
+  border-bottom: 6px solid #ebedef;
+}
+
+.items-footer {
+  border-top: 6px solid #ebedef;
+}
+
+.item-unit-descr {
+  width: 210px;
+}

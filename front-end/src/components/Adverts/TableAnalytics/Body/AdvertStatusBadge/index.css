@@ -1,0 +1,15 @@
+.table-line-warning {
+  background-color: #ffc107;
+}
+.table-line-success {
+  background-color: #4dbd74;
+}
+.table-line-danger {
+  background-color: #f86c6b;
+}
+.table-line-secondary {
+  background-color: #c8ced3;
+}
+.table-line-info {
+  background-color: #63c2de;
+}

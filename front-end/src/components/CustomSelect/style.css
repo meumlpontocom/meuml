@@ -1,0 +1,44 @@
+#container-select {
+    width: 100%;
+    position: relative;
+}
+
+#select-input {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#opned-select {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    z-index: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#option-select {
+    all: unset; 
+    width: 100%;
+    height: 30px; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    background: #fff;
+}
+
+#option-select:hover {
+   background: #f2f2f2;
+   cursor: pointer;
+}

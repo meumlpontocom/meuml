@@ -1,0 +1,20 @@
+.tags-box {
+  min-height: 52px;
+}
+
+.badge-close-button {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  border: 1px transparent;
+  cursor: pointer;
+
+  i {
+    font-size: 0.475rem;
+    line-height: 1rem;
+
+    &:hover {
+      font-weight: bold;
+    }
+  }
+}

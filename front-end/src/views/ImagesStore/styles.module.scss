@@ -1,0 +1,44 @@
+.cardWidth {
+  max-width: 1200px;
+}
+
+.collectionsCard {
+  padding: 12px;
+  overflow-x: auto;
+}
+
+.foldersContainer {
+  background-color: var(--light-legacy-theme);
+  overflow-x: auto;
+  min-width: 45px;
+}
+
+.folderColapse {
+  width: 44px;
+  transition: all 0.2s ease;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.folderOpen {
+  min-width: 200px;
+  max-width: 350px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.buttonPositioning {
+  position: relative;
+  right: 7px;
+}
+
+@media only screen and (max-width: 400px) {
+  .buttonPositioning {
+    right: 9px;
+  }
+  .folderColapse {
+    width: 40px;
+    transition: all 0.2s ease;
+    margin-right: 12px;
+  }
+}

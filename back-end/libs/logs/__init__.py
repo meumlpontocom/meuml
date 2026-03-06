@@ -1,0 +1,1 @@
+from meuml2core.libs.logs.log_settings import get_logger

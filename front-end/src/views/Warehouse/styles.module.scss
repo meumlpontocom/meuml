@@ -1,0 +1,128 @@
+.cardsWidth {
+  max-width: 1200px;
+}
+
+.codeInput {
+  width: 20%;
+  min-width: 130px;
+}
+
+.nameInput {
+  width: 80%;
+  min-width: 130px;
+}
+
+.codeList {
+  width: 20%;
+}
+
+.nameList {
+  min-width: 50%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.listButtons {
+  width: 30%;
+  min-height: 28px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.editButton,
+.clearButton {
+  margin: 0 16px;
+  i {
+    position: relative;
+    top: 2px;
+  }
+}
+
+.defaultButton {
+  min-width: 93px;
+}
+
+.deleteButton,
+.confirmButton {
+  i {
+    position: relative;
+    top: 2px;
+  }
+}
+.iconFix {
+  font-size: 16px;
+}
+
+.warehouseList {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px;
+  width: 100%;
+  min-height: 44px;
+  border-bottom: 1px solid #d8dbe0;
+  transition: background-color 0.15s ease-out;
+  flex-wrap: wrap;
+
+  &:hover {
+    background-color: #ebedef;
+  }
+}
+
+.listCodeInput {
+  width: 30%;
+  padding-right: 12px;
+}
+
+.listNameInput {
+  width: 30%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+@media only screen and (max-width: 800px) {
+  .listButtons {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+  }
+  .nameList {
+    width: 70%;
+  }
+
+  .warehouseList {
+    min-height: 100px;
+  }
+
+  .defaultButton {
+    width: 90px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .editButton {
+    width: 90px;
+  }
+
+  .clearButton {
+    margin: 0 12px 0 0;
+    flex: 1;
+  }
+
+  .confirmButton {
+    margin-left: 12px;
+    flex: 1;
+  }
+
+  .deleteButton {
+    width: 90px;
+  }
+
+  .listNameInput {
+    width: 70%;
+  }
+}

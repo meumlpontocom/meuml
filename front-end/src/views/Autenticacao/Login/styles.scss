@@ -1,0 +1,22 @@
+.login-cards {
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card-width {
+  max-width: 920px;
+}
+
+@media only screen and (max-width: 375px) {
+  .responsive-display {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .login-cards {
+    flex-direction: column;
+    padding-top: 12px;
+    justify-content: flex-start;
+  }
+}

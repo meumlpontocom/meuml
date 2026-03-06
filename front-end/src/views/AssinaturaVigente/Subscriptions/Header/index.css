@@ -1,0 +1,16 @@
+.card-header {
+  color: #4E4E4E;
+  font-weight: bold;
+}
+
+.price {
+  float: right;
+}
+
+.free-badge {
+  color: #007700;
+}
+
+.professional-badge {
+  color: #ffbf00;
+}

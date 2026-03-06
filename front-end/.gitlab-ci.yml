@@ -1,0 +1,130 @@
+stages:
+  - install
+  - build
+  - deploy
+
+Installing Dependencies Homolog:
+  stage: install
+  tags:
+    - homolog
+  before_script:
+    # Configurar NVM
+    - export NVM_DIR="$HOME/.nvm"
+    - mkdir -p $NVM_DIR
+    - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+    - source $NVM_DIR/nvm.sh
+    
+    # Instalar e usar Node.js versão 16
+    - nvm install 16.20.0
+    - nvm use 16.20.0
+    - node -v
+    
+    # Instalar Yarn
+    - curl -o- -L https://yarnpkg.com/install.sh | bash
+    - export PATH="$PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin"
+    - yarn --version
+  script:
+    - echo "Installing dependencies..."
+    - cd /application/front-end-cicd
+    - whoami
+    - pwd
+    - git config --global --add safe.directory /application/front-end-cicd
+    - git config --global user.email "ci-homolog-b@example.com"
+    - git config --global user.name "ci-homolog-b"
+    - git config pull.rebase false
+    - git checkout homolog
+    - git pull https://ci-homolog-b:ci-homolog-b@gitlab.com/bitflix/front-end.git homolog
+    - yarn
+  only:
+    - homolog
+    - merge-request
+
+Installing Dependencies Production:
+  stage: install
+  tags:
+    - front-producao
+  script:
+    - echo "Installing dependencies..."
+    - whoami
+    - pwd
+    - cd /application/front-end-cicd/
+    - git config --global --add safe.directory /application/front-end-cicd
+    - git config --global user.email "ci-homolog-b@example.com"
+    - git config --global user.name "ci-homolog-b"
+    - git config pull.rebase false
+    - git checkout master
+    - git pull https://ci-homolog-b:ci-homolog-b@gitlab.com/bitflix/front-end.git master
+    - sh /application/front-end/scripts/run/install.sh
+  only:
+    - master
+    - merge-request
+
+Building Homolog:
+  stage: build
+  tags:
+    - homolog
+  before_script:
+    # Configurar NVM
+    - export NVM_DIR="$HOME/.nvm"
+    - mkdir -p $NVM_DIR
+    - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+    - source $NVM_DIR/nvm.sh
+    
+    # Instalar e usar Node.js versão 16
+    - nvm install 16.20.0
+    - nvm use 16.20.0
+    - node -v
+    
+    # Instalar Yarn
+    - curl -o- -L https://yarnpkg.com/install.sh | bash
+    - export PATH="$PATH:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin"
+    - yarn --version
+  script:
+    - echo "Building for homolog..."
+    - pwd
+    - cd /application/front-end-cicd
+    - CI=false yarn build:staging
+  only:
+    - homolog
+    - merge-request
+
+Building Production:
+  stage: build
+  tags:
+    - front-producao
+  script:
+    - echo "Building for production..."
+    - pwd
+    - cd /application/front-end-cicd
+    - CI=false sh /application/front-end/scripts/run/build.sh
+  only:
+    - master
+    - merge-request
+
+Deploying Homolog:
+  stage: deploy
+  tags:
+    - homolog
+  environment:
+    name: homologacao
+  script:
+    - cd /application
+    - rsync -av --progress --delete front-end-cicd/build front-end
+    - echo "Successfully deployed for homolog!"
+  only:
+    - homolog
+    - merge-request
+
+Deploying Production:
+  stage: deploy
+  tags:
+    - front-producao
+  environment:
+    name: producao
+  script:
+    - cd /application
+    - rsync -av --progress --delete front-end-cicd/build front-end
+    - echo "Successfully deployed for production!"
+  only:
+    - master
+    - merge-request

@@ -1,0 +1,19 @@
+#star-silver {
+  color: silver;
+}
+
+#star-gold {
+  color: gold;
+}
+
+#star-platinum {
+  color: powderblue;
+}
+
+.img-card-body {
+  padding: 20%;
+}
+
+.img-card {
+  background-color: #dddddd;
+}

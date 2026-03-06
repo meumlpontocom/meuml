@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "dev:back": "node scripts/run-backend.js",
+    "dev:front": "node scripts/run-frontend.js",
+    "dev:full": "concurrently -n BACK,FRONT -c cyan,green \"npm run dev:back\" \"npm run dev:front\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

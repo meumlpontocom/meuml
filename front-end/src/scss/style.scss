@@ -1,0 +1,45 @@
+// If you want to override variables do it here
+@import "variables";
+
+// Import CoreUI styles
+@import "~@coreui/coreui-pro/scss/coreui.scss";
+
+// If you want to add something do it here
+@import "custom";
+
+.swal2-popup {
+  padding: 0.5em;
+}
+
+.title-collapse {
+  color: #000;
+  margin-top: 8px;
+}
+
+.title-faq {
+  font-size: 25px;
+  color: #000;
+  margin-bottom: 25px;
+}
+
+.hr-footer {
+  margin-top: -2px;
+  border-top: 1px solid #d8dbe0;
+  width: 100%;
+}
+
+.contentNone{
+  display: none;
+}
+
+.contentNoneAddFaq{
+  display: none;
+}
+
+.text-dark{
+  color: #000 !important;
+}
+
+#btn-showpass :hover{
+  cursor: pointer;
+}

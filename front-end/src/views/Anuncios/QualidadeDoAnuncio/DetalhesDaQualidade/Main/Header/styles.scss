@@ -1,0 +1,13 @@
+.recommendations-card {
+  min-width: 254px;
+}
+
+.chart-content {
+  position: relative;
+
+  .chart-percentage {
+    position: absolute;
+    top: 40%;
+    right: 30%;
+  }
+}

@@ -1,0 +1,1 @@
+alter table meuml.faq add column tag varchar null;

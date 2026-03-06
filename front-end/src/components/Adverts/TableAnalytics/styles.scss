@@ -1,0 +1,113 @@
+@media only screen and (max-width: 767px) {
+  tr {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    border-top: 1px solid #c8ced3;
+    border-bottom: 1px solid #c8ced3;
+  }
+
+  thead {
+    display: none;
+  }
+
+  .table th,
+  .table td {
+    border-top: none;
+  }
+
+  .table-line-danger,
+  .table-line-warning,
+  .table-line-success,
+  .table-line-secondary {
+    position: absolute;
+    height: 42px;
+    width: 4px;
+    border-radius: 0 2px 2px 0;
+    top: 0;
+    left: 0;
+  }
+
+  .select-ad-row {
+    width: 100%;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #c8ced3;
+    border-top: 1px solid #c8ced3;
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      margin-left: 10px;
+    }
+  }
+
+  .table-advert-thumb {
+    width: 20%;
+    border-bottom: 1px solid #c8ced3;
+  }
+
+  .advert-description {
+    width: 80%;
+    border-bottom: 1px solid #c8ced3;
+  }
+
+  .options-container {
+    position: absolute;
+    top: -1px;
+    padding: 0;
+    right: 9px;
+  }
+  .advert-tags {
+    flex-grow: 1;
+  }
+}
+
+@media only screen and (max-width: 575px) {
+  .table-advert-thumb {
+    display: none;
+  }
+
+  .advert-description {
+    width: 100%;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+}
+
+.options-button {
+  vertical-align: middle;
+  min-width: 100px;
+  justify-content: space-around;
+  z-index: 999;
+}
+
+.table-line-danger {
+  background-color: #e21627 !important;
+}
+
+.table-line-warning {
+  background-color: rgb(212, 186, 37) !important;
+}
+
+.table-line-success {
+  background-color: rgb(14, 206, 24) !important;
+}
+
+.table-line-secondary {
+  background-color: rgb(146, 146, 146) !important;
+}
+
+p {
+  margin-bottom: 1% !important;
+}
+
+.popupConentAlign {
+  text-align: left;
+  padding-left: 5%;
+  padding-top: 5%;
+}
+
+.advert-tags {
+  width: 20%;
+}

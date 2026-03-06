@@ -1,0 +1,6 @@
+{
+  "name": "ListaContas",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ListaContas.js"
+}

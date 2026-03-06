@@ -1,0 +1,6 @@
+{
+  "name": "MeusBloqueios",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./MeusBloqueios.js"
+}

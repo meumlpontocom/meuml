@@ -1,0 +1,17 @@
+.pointer {
+  cursor: pointer;
+}
+.module {
+  line-height: 5mm;
+}
+
+.module-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 0px;
+}
+
+.module-description {
+  font-size: 12;
+  color: #4e4e4e;
+}

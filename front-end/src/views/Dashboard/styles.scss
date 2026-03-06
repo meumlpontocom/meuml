@@ -1,0 +1,36 @@
+.infocard-double-title {
+  max-width: 14ch;
+}
+.infocard-double-width {
+  min-width: 410px;
+  max-width: 410px;
+}
+
+.card-height {
+  height: 158px;
+}
+
+.infocard-width {
+  min-width: 280px;
+  max-width: 280px;
+}
+.infocard-title {
+  max-width: 9ch;
+  margin: 0 auto;
+}
+
+@media (max-width: 620px) {
+  .infocard-width {
+    min-width: 214px;
+    max-width: 214px;
+  }
+
+  .infocard-double-title {
+    max-width: 15ch;
+  }
+
+  .infocard-double-width {
+    min-width: 429px;
+    max-width: 429px;
+  }
+}

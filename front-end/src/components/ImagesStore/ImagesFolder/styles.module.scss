@@ -1,0 +1,58 @@
+.folderCard {
+  border: 1px solid transparent;
+  background-color: rgba(255, 255, 255, 0);
+  border-radius: 0.25rem;
+  margin: 0.5rem;
+  transition: background-color 0.05s ease;
+  white-space: nowrap;
+  min-width: 150px;
+
+  & + .folderCard {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  i {
+    font-size: 1rem;
+  }
+
+  a {
+    color: #3c4b64 !important;
+    text-decoration: none;
+  }
+
+  a:visited {
+    color: #3c4b64;
+  }
+
+  &:hover {
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.subFolder {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  padding-left: 2rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.selectedImg {
+  color: white;
+  background: rgba(0, 109, 246, 0.67);
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 400px) {
+  .folderCard {
+    h6,
+    i {
+      font-size: 0.75rem;
+    }
+  }
+}

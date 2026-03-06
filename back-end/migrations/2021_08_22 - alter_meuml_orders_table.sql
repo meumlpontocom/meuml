@@ -1,0 +1,1 @@
+alter table meuml.orders add column "mshops_order" boolean null default false;
