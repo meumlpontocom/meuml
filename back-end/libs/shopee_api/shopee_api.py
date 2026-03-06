@@ -207,7 +207,7 @@ class ShopeeApi:
             send_notification(str(account['user_id']), {'title': 'MeuML - conta Shopee perdeu autenticação', 'url': '/contas', 'body': f'A conta {account["name"]} da Shopee perdeu autenticação. Por favor, faça login e autorize novamente a integração com o MeuML'})
 
             WhatsappApi.send_text_message_to_user(
-                self,
+                action,
                 account['user_id'],
                 account['id'],
                 'SP',
