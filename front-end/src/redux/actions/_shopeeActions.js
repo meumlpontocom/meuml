@@ -11,6 +11,7 @@ import {
   SHOPEE_SET_REPLICATION_COPY_SAME,
   SHOPEE_RESET_STATES,
   SHOPEE_SET_STOCK_FILTER,
+  SHOPEE_SET_SORT,
   SHOPEE_CATEGORIES_TREE,
   SET_SHOPEE_CATEGORIES_TREE_LOADING,
 } from "./action-types";
@@ -18,6 +19,10 @@ import {
 // ADVERTS
 export function setStockFilter(selected) {
   return { type: SHOPEE_SET_STOCK_FILTER, selectedFilter: selected };
+}
+
+export function setShopeeSort(sort) {
+  return { type: SHOPEE_SET_SORT, payload: sort };
 }
 
 export function resetShopeeStates() {

@@ -17,7 +17,11 @@ export default function createShopeeFilterQuery(filters) {
 
   const stockFilter = filters.stock?.value ? "stock=1&" : "";
 
-  const filtersString = `${statusFilter}${conditionsFilter}${stringFilter}${accountsFilter}${stockFilter}`;
+  const sortFilter = filters.sort
+    ? `sort_name=${filters.sort.value[0]}&sort_order=${filters.sort.value[1]}&`
+    : "";
+
+  const filtersString = `${statusFilter}${conditionsFilter}${stringFilter}${accountsFilter}${stockFilter}${sortFilter}`;
 
   return filtersString;
 }

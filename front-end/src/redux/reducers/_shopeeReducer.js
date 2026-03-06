@@ -10,6 +10,7 @@ import {
   SHOPEE_SET_REPLICATION_COPY_SAME,
   SHOPEE_RESET_STATES,
   SHOPEE_SET_STOCK_FILTER,
+  SHOPEE_SET_SORT,
   SHOPEE_CATEGORIES_TREE,
   SET_SHOPEE_CATEGORIES_TREE_LOADING,
 } from "../actions/action-types";
@@ -27,6 +28,7 @@ const INITIAL_STATE = {
       condition: [],
       string: "",
       stock: { label: "Qualquer estoque", value: false },
+      sort: null,
     },
     pagination: {
       first_page: 1,
@@ -67,6 +69,18 @@ const INITIAL_STATE = {
 export default function _shopeeReducer(state = INITIAL_STATE, action) {
   const currentView = window.location.href.split("#/")[1];
   switch (action.type) {
+    case SHOPEE_SET_SORT:
+      return {
+        ...state,
+        advertising: {
+          ...state.advertising,
+          filters: {
+            ...state.advertising.filters,
+            sort: action.payload,
+          },
+        },
+      };
+
     case SHOPEE_SET_STOCK_FILTER:
       return {
         ...state,

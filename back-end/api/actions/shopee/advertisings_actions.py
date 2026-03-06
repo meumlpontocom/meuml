@@ -55,7 +55,7 @@ class ShopeeAdvertisingsActions(Actions):
         return self.return_success(data=advertisings, meta=meta)
 
 
-    def order(self, request, fields, query, default_table='od', join_tables=[], change_default_order=None):
+    def order(self, request, fields, query, default_table='ad', join_tables=[], change_default_order=None):
         fields = [field if type(re.search('"(.*)"',field)) is type(None) else re.search('"(.*)"',field).group(1) for field in fields]
         fields = [field[3:] if field[2]=='.' else field for field in fields]
         values = {}

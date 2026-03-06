@@ -8,6 +8,7 @@ import AccountsDropdown from "../../../components/AccountsDropdown";
 import {
   setAdvertsFilterString,
   setSelectedAccountList,
+  setShopeeSort,
   setStockFilter,
 } from "../../../redux/actions/_shopeeActions";
 import ButtonComponent from "src/components/ButtonComponent";
@@ -55,6 +56,21 @@ function FiltersCard() {
               { label: "Qualquer estoque", value: false },
               { label: "Maior que zero", value: true },
             ]}
+          />
+          <SelectMenu
+            multiple={false}
+            options={[
+              { label: "Mais vendidos", value: ["sales", "desc"] },
+              { label: "Menos vendidos", value: ["sales", "asc"] },
+              { label: "Maior preço", value: ["price", "desc"] },
+              { label: "Menor preço", value: ["price", "asc"] },
+              { label: "Nome A - Z", value: ["name", "asc"] },
+            ]}
+            onSelect={selected => dispatch(setShopeeSort(selected))}
+            selected={filters.sort}
+            xs="12"
+            md="4"
+            placeholder="Ordenar por"
           />
           <SelectMenu
             multiple={true}
