@@ -60,7 +60,7 @@ export default function ConfirmationHeader() {
     [dispatch],
   );
 
-  const checkSelectedAccountsOfficialStores = async () => {
+  const checkSelectedAccountsOfficialStores = useCallback(async () => {
     if (!selectedAccounts?.length) {
       dispatch(setAccountsOfficialStores([]));
       dispatch(setSelectedOfficialStore({}));
@@ -81,16 +81,16 @@ export default function ConfirmationHeader() {
       dispatch(setAccountsOfficialStores(accountsWithOfficialStore));
     }
 
-    if (accountsWithOfficialStore.length != 1) {
+    if (accountsWithOfficialStore.length !== 1) {
       dispatch(setSelectedOfficialStore({}));
     }
 
     dispatch(setIsLoadingAccountsOfficialStores(false));
-  };
+  }, [selectedAccounts, dispatch]);
 
   useEffect(() => {
     checkSelectedAccountsOfficialStores();
-  }, [selectedAccounts]);
+  }, [checkSelectedAccountsOfficialStores]);
 
   return (
     <CCard>
@@ -154,7 +154,7 @@ export default function ConfirmationHeader() {
               selected={selectedOfficialStore}
               callback={selectOfficialStore}
               multipleSelection={false}
-              disabled={isLoadingAccountsOfficialStores || accountsWithOfficialStore != 1}
+              disabled={isLoadingAccountsOfficialStores || accountsWithOfficialStore !== 1}
               placeholder={"Selecione uma Loja Oficial"}
             />
 

@@ -2,12 +2,9 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-redeclare */
 import React, { Component } from "react";
-import axios from "axios";
 import Swal from "sweetalert2";
-import { getToken } from "../../../services/auth";
 import { CSwitch } from "@coreui/react";
 import { Picky } from "react-picky";
-import ReactLoading from "react-loading";
 import {
   Row,
   Col,

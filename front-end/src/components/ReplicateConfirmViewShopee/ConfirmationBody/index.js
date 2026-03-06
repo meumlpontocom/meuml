@@ -16,8 +16,6 @@ const ConfirmationBody = React.memo(() => {
   const selectedAdverts = useSelector(state => state.advertsReplication.selectedAdverts);
   const advertsArray = useSelector(state => state.selectedAdverts.advertsArray);
   const isCategoriesLoading = useSelector(state => state.shopee.categoriesTree.isLoading);
-  const categoryId = useSelector(state => state.advertsReplication?.categoryId);
-
   const tableData = useMemo(() => {
     return selectedAdverts.length
       ? selectedAdverts
@@ -55,7 +53,7 @@ const ConfirmationBody = React.memo(() => {
         shopeeRequiredAttributes: advert.shopeeRequiredAttributes || [],
       };
     });
-  }, [tableData, categoryId]);
+  }, [tableData]);
 
   const columns = [
     { label: "Código", datakey: "id" },

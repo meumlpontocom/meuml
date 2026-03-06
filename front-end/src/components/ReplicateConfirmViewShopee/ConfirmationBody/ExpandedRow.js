@@ -1,5 +1,3 @@
-"use strict";
-
 import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Input } from "reactstrap";
@@ -12,9 +10,7 @@ import {
   setAdvertWeight,
   setRequiredAttributes,
   setSelectedCategory,
-  saveSelectedAdvert,
 } from "src/redux/actions/_replicationActions";
-import { Picky } from "react-picky";
 import { RequiredAttributeInput } from "./RequiredAttributeInput";
 import { getShopeeCategoryRequiredAttributes } from "./getShopeeCategoryRequiredAttributes";
 

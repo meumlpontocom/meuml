@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import Pagination from "react-js-pagination";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useLocation } from "react-router-dom";
@@ -21,12 +21,15 @@ const Paginate = ({ callLoading, loading }) => {
   const currentPageParams = searchParams.get("page") ? Number(searchParams.get("page")) : null;
   const pageInputRef = useRef(currentPage);
 
-  function setPageParam(page) {
-    searchParams.set("page", page);
-    history.replace({ search: searchParams.toString() });
-  }
+  const setPageParam = useCallback(
+    page => {
+      searchParams.set("page", page);
+      history.replace({ search: searchParams.toString() });
+    },
+    [searchParams, history],
+  );
 
-  const fetchAndDispatch = page => {
+  const fetchAndDispatch = useCallback(page => {
     callLoading(true);
     dispatch(clearAdvertsState());
     fetchAds({ url, page })
@@ -44,15 +47,18 @@ const Paginate = ({ callLoading, loading }) => {
           showCloseButton: true,
         });
       });
-  };
+  }, [callLoading, dispatch, url]);
 
-  function handleChangePage(page) {
-    if (page !== meta.page) {
-      window.scrollTo({ top: 0 });
-      setPageParam(page);
-      fetchAndDispatch(`page=${page}`);
-    }
-  }
+  const handleChangePage = useCallback(
+    page => {
+      if (page !== meta.page) {
+        window.scrollTo({ top: 0 });
+        setPageParam(page);
+        fetchAndDispatch(`page=${page}`);
+      }
+    },
+    [meta.page, setPageParam, fetchAndDispatch],
+  );
 
   function goToSpecificPage(e) {
     e.preventDefault();
@@ -73,7 +79,7 @@ const Paginate = ({ callLoading, loading }) => {
     if (!currentPageParams) {
       setPageParam(1);
     }
-  }, [currentPageParams, meta.page, meta.total, loading]);
+  }, [currentPageParams, meta.page, meta.total, loading, handleChangePage, setPageParam]);
 
   return (
     <div>

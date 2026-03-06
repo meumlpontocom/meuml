@@ -331,6 +331,7 @@ export function createAdvertObject({
                   mode: selectedShippingMode,
                 };
               } else if (prop === "variations" && advert.ean) {
+                // eslint-disable-next-line no-loop-func -- eanOnVariation is intentionally shared across loop iterations as a flag
                 advertObject.override["variations"] = [...advert.variations].map(variation => {
                   eanOnVariation = true;
                   if (variation.attributes) {

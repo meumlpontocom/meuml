@@ -1,6 +1,6 @@
 /* eslint-disable no-extend-native */
 import axios from "axios";
-import { isUndefined, isNull } from "util";
+import { isUndefined } from "util";
 import timeConstructor from "../../../services/timeHandler";
 import { SYNC_ALL_LOG, SYNC_LOG, getToken } from "../../../services/auth";
 

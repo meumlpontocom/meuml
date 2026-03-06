@@ -1,9 +1,7 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react/no-direct-mutation-state */
 import React, { Component } from "react";
-import axios from "axios";
 import Swal from "sweetalert2";
-import { getToken } from "../../../services/auth";
 import Pagination from "react-js-pagination";
 import { Picky } from "react-picky";
 import "react-toastify/dist/ReactToastify.css";

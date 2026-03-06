@@ -74,16 +74,6 @@ const useCategories = () => {
       });
 
       const isCategoryLeaf = !predictedData?.has_children;
-      let formattedCategoryRequiredAttributes = [];
-
-      // if (isCategoryLeaf) {
-      //   const response = await getShopeeCategoryRequiredAttributes([predictedCategoryId]);
-      //   const data = response.data.data ?? {};
-
-      //   const requiredAttributes = data[predictedCategoryId] ?? [];
-
-      //   formattedCategoryRequiredAttributes = formatRequiredAttributes(requiredAttributes);
-      // }
 
       const advertWithCategory = {
         ...advert,
@@ -100,19 +90,11 @@ const useCategories = () => {
       //   }),
       // );
     } catch (error) {
+      console.error(error);
       return {
         ...advert,
         categoryId: undefined,
       };
-
-      // dispatch(
-      //   saveSelectedAdvert({
-      //     ...advert,
-      //     categoryId: undefined,
-      //     shopeeRequiredAttributes: [],
-      //   }),
-      // );
-      console.error(error);
     }
   };
 

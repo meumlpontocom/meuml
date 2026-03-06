@@ -1,9 +1,9 @@
-import React, { useCallback, useContext, useMemo } from "react";
+import React, { useContext, useMemo } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import shopeeMlReplicationContext from "../shopeeReplicateToMLContext";
 
 const SelectedChartTable = ({ options = [] }) => {
-  const { selectedChartOptions, selectedChartRow, setSelectedChartRow } =
+  const { selectedChartOptions } =
     useContext(shopeeMlReplicationContext);
 
   const selectedChart = useMemo(

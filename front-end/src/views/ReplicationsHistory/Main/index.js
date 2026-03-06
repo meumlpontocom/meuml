@@ -57,7 +57,7 @@ const ReplicationsHistory = () => {
     history.replace({ search: searchParams.toString() });
   }
 
-  async function handleListReplications() {
+  const handleListReplications = useCallback(async () => {
     try {
       setIsLoading(true);
 
@@ -75,11 +75,11 @@ const ReplicationsHistory = () => {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [page]);
 
   useEffect(() => {
     handleListReplications();
-  }, [page]);
+  }, [handleListReplications]);
 
   return (
     <div className="animated">

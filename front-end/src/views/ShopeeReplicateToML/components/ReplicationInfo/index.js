@@ -78,6 +78,7 @@ const ReplicationInfo = () => {
 
   useEffect(() => {
     calculateEstimatedCost();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- calculateEstimatedCost is redefined every render; only recalculate when inputs change
   }, [selectedAccounts, selectedCategory]);
 
   return (

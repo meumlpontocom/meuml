@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { CCallout, CCol } from "@coreui/react";
 import axios from "axios";
@@ -70,7 +70,7 @@ export default function EstimatedCoast() {
     }
   }
 
-  async function calculateEstimatedCost() {
+  const calculateEstimatedCost = useCallback(async function calculateEstimatedCost() {
     setIsLoadingCost(true);
     const selectedAds = Object.values(advertsArray).filter(advert => advert.checked);
     const selectedAdsAmount = selectedAds.length;
@@ -110,11 +110,11 @@ export default function EstimatedCoast() {
     );
     setEstimatedCost(formattedPrice);
     setIsLoadingCost(false);
-  }
+  }, [allChecked, advertsArray, selectedAccounts, calculateTotalForAllChecked, calculateTotalOfVariations]);
 
   useEffect(() => {
     calculateEstimatedCost();
-  }, [selectedAccounts]);
+  }, [calculateEstimatedCost]);
 
   return (
     <CCol xs={12} sm={4}>

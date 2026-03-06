@@ -154,6 +154,8 @@ const useReplication = () => {
     advertsFiltersState,
     allow_copying_warranty,
     copyShippingTerm,
+    replication_mode,
+    selectedOfficialStore,
   ]);
 
   return { submitRequest };

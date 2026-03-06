@@ -39,6 +39,7 @@ const Gtin = ({ handleFormChange, updateFormValue }) => {
         value: "keep-original-gtin",
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run on mount to set initial gtin_behavior default
   }, []);
 
   return (

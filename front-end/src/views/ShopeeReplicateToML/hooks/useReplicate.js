@@ -96,7 +96,7 @@ const useReplicate = () => {
       ],
       variations_amount: variationsAmount,
     };
-  }, [selectedCategory, required, basic, chartsAttributes, selectedAccounts, history, variationsAmount]);
+  }, [selectedCategory, required, basic, chartsAttributes, selectedAccounts, history, variationsAmount, selectedOfficialStore]);
 
   const submitReplicationRequest = useCallback(
     async (confirmed = 0, pictures = []) => {
@@ -134,7 +134,7 @@ const useReplicate = () => {
         });
       }
     },
-    [createMlAdvertPayload],
+    [createMlAdvertPayload, history],
   );
   const handleSubmitReplication = useCallback(async () => {
     if (basic.pictures_shopee?.length) return await submitReplicationRequest(0);

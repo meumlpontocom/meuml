@@ -54,7 +54,7 @@ const SelectAccount = () => {
       setAccountsOfficialStores(accountsWithOfficialStore);
     }
 
-    if (accountsWithOfficialStore.length != 1) {
+    if (accountsWithOfficialStore.length !== 1) {
       setSelectedOfficialStore(null);
     }
 
@@ -63,6 +63,7 @@ const SelectAccount = () => {
 
   useEffect(() => {
     checkSelectedAccountOfficialStores();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- checkSelectedAccountOfficialStores is redefined every render; only re-run when selectedAccounts changes
   }, [selectedAccounts]);
 
   return (
@@ -110,7 +111,7 @@ const SelectAccount = () => {
                   selected={selectedOfficialStore}
                   callback={selectOfficialStore}
                   multipleSelection={false}
-                  disabled={loadingOfficialStores || accountsWithOfficialStore != 1}
+                  disabled={loadingOfficialStores || accountsWithOfficialStore !== 1}
                   placeholder={"Selecione uma Loja Oficial"}
                 />
 

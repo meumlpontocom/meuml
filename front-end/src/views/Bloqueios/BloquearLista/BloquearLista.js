@@ -6,7 +6,6 @@ import { CSwitch } from "@coreui/react";
 import Swal from "sweetalert2";
 // import { getToken } from "../../../services/auth";
 import { Picky } from "react-picky";
-import ReactLoading from "react-loading";
 // import LoadingCardData from "../../../components/LoadingCardData";
 import { Card, CardBody, CardFooter, Form, Label, FormGroup, Input, Button, Col, Row } from "reactstrap";
 
