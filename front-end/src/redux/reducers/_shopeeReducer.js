@@ -11,6 +11,7 @@ import {
   SHOPEE_RESET_STATES,
   SHOPEE_SET_STOCK_FILTER,
   SHOPEE_SET_SORT,
+  SHOPEE_SELECT_ALL_ADS_FROM_PAGE,
   SHOPEE_CATEGORIES_TREE,
   SET_SHOPEE_CATEGORIES_TREE_LOADING,
 } from "../actions/action-types";
@@ -69,6 +70,20 @@ const INITIAL_STATE = {
 export default function _shopeeReducer(state = INITIAL_STATE, action) {
   const currentView = window.location.href.split("#/")[1];
   switch (action.type) {
+    case SHOPEE_SELECT_ALL_ADS_FROM_PAGE:
+      const allPageChecked = Object.values(state.advertising.selected).every(ad => ad.checked);
+      const toggledPageSelection = {};
+      Object.values(state.advertising.selected).forEach(ad => {
+        toggledPageSelection[ad.id] = { ...ad, checked: !allPageChecked };
+      });
+      return {
+        ...state,
+        advertising: {
+          ...state.advertising,
+          selected: toggledPageSelection,
+        },
+      };
+
     case SHOPEE_SET_SORT:
       return {
         ...state,

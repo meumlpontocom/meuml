@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import fetchShopeeAdverts from "./requests";
 import LoadPageHandler from "../../components/Loading";
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectAllAdverts } from "src/redux/actions/_shopeeActions";
+import { setSelectAllAdverts, toggleSelectAllAdsFromPage } from "src/redux/actions/_shopeeActions";
 import { CBadge, CButtonGroup, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CRow } from "@coreui/react";
 import { DropDown } from "../../components/buttons/ButtonGroup";
 import ButtonComponent from "src/components/ButtonComponent";
@@ -30,6 +30,11 @@ export default function ShopeeAdverts({ history }) {
 
     return false;
   }, [selectAll, selected]);
+
+  const allPageSelected = React.useMemo(() => {
+    const selectedValues = Object.values(selected);
+    return selectedValues.length > 0 && selectedValues.every(ad => ad.checked);
+  }, [selected]);
 
   const selectedInfo = React.useMemo(() => {
     const selectedAds = Object.values(selected).filter(x => x.checked === true);
@@ -71,6 +76,14 @@ export default function ShopeeAdverts({ history }) {
             <CCardHeader>
               <CRow>
                 <CCol xs="12" sm="12" md="5" lg="8" className="mb-3">
+                  <ButtonComponent
+                    color={allPageSelected ? "danger" : "secondary"}
+                    onClick={() => dispatch(toggleSelectAllAdsFromPage())}
+                    icon={allPageSelected ? "cil-check-circle" : "cil-circle"}
+                    title={allPageSelected ? "Deselecionar Todos da Página" : "Selecionar Todos da Página"}
+                    variant=""
+                    className="mr-2"
+                  />
                   <CButtonGroup>
                     <ButtonComponent
                       color="primary"

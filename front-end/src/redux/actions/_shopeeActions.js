@@ -12,6 +12,7 @@ import {
   SHOPEE_RESET_STATES,
   SHOPEE_SET_STOCK_FILTER,
   SHOPEE_SET_SORT,
+  SHOPEE_SELECT_ALL_ADS_FROM_PAGE,
   SHOPEE_CATEGORIES_TREE,
   SET_SHOPEE_CATEGORIES_TREE_LOADING,
 } from "./action-types";
@@ -50,6 +51,10 @@ export function setSelectedAdvertising(selected) {
 
 export function setSelectAllAdverts(areSelected) {
   return { type: SHOPEE_SET_SELECTED_ALL_ADS, payload: areSelected };
+}
+
+export function toggleSelectAllAdsFromPage() {
+  return { type: SHOPEE_SELECT_ALL_ADS_FROM_PAGE };
 }
 // REPLICATION
 export function setToggleCopyDuplicateAds({ label, value }) {
